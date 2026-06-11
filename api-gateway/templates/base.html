@@ -377,6 +377,7 @@
         .card:hover {
             box-shadow: var(--shadow-md);
             border-color: var(--green-200);
+            transform: translateY(-3px);
         }
 
         /* ===== Alerts ===== */
@@ -1078,7 +1079,7 @@
                     const resp = await fetch('/api/chat/advice/', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: text, customer_id: {{ customer_id|default:"null" }} })
+                        body: JSON.stringify({ message: text, customer_id: parseInt("{{ customer_id }}") })
                     });
                     hideTyping();
 
@@ -1127,6 +1128,21 @@
         })();
     </script>
     {% endif %}
+    <script>
+        (function() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href) return;
+                // Highlighting active page link based on the pathname
+                if (href === currentPath || 
+                    (href !== '/' && currentPath.startsWith(href)) || 
+                    (href.includes('/products/') && currentPath.includes('/products/'))) {
+                    link.classList.add('active');
+                }
+            });
+        })();
+    </script>
 </body>
 
 </html>
