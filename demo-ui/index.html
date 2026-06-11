@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vinh Tech Store - Static UI Demo</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0a1627;
+      --panel: #0c182a;
+      --panel-2: #0e1c31;
+      --line: rgba(140, 162, 194, .14);
+      --line-strong: rgba(140, 162, 194, .24);
+      --text: #f5f8ff;
+      --muted: #7687a2;
+      --muted-2: #536580;
+      --purple: #6c5cff;
+      --purple-2: #4b3cf0;
+      --blue: #3a94ff;
+      --green: #13cca0;
+      --orange: #f79236;
+      --red: #f05b70;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .22);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    button, input, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    .muted { color: var(--muted); }
+    .tiny { color: var(--muted); font-size: 11px; }
+    .green { color: var(--green); }
+    .purple { color: var(--purple); }
+    .money { font-weight: 800; color: var(--green); white-space: nowrap; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; animation: fade .22s ease; }
+    .screen.admin.active { display: grid; }
+    @keyframes fade { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* Demo switcher */
+    .demo-switcher {
+      position: fixed; right: 22px; bottom: 22px; z-index: 30;
+      display: flex; align-items: flex-end; gap: 10px;
+    }
+    .demo-switcher.open .demo-menu { display: grid; }
+    .demo-menu {
+      display: none; width: 230px; padding: 10px;
+      background: rgba(12, 24, 42, .97); border: 1px solid var(--line-strong);
+      border-radius: 14px; box-shadow: var(--shadow); backdrop-filter: blur(18px);
+    }
+    .demo-menu a {
+      display: flex; align-items: center; gap: 9px; padding: 10px 11px;
+      border-radius: 8px; color: #aab9d0; font-size: 12px; font-weight: 700;
+    }
+    .demo-menu a:hover, .demo-menu a.current { color: white; background: rgba(108, 92, 255, .16); }
+    .demo-toggle {
+      width: 52px; height: 52px; border: 0; border-radius: 50%; color: white;
+      cursor: pointer; background: linear-gradient(145deg, var(--purple), #4228ff);
+      box-shadow: 0 0 0 5px rgba(108, 92, 255, .12), 0 8px 25px rgba(64, 48, 255, .45);
+      font-size: 22px;
+    }
+    .chatbot {
+      position: fixed; right: 22px; bottom: 88px; z-index: 25; width: min(360px, calc(100vw - 28px));
+      overflow: hidden; border: 1px solid var(--line-strong); border-radius: 16px; background: rgba(255,255,255,.98);
+      box-shadow: 0 22px 55px rgba(55, 83, 127, .2); transition: .22s ease;
+    }
+    .chatbot.closed { display: none; }
+    .chat-head {
+      display: flex; align-items: center; gap: 10px; padding: 14px 15px; color: white;
+      background: linear-gradient(110deg, #3754ed, #667cff);
+    }
+    .chat-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.2); font-size: 17px; }
+    .chat-head strong { display: block; font-size: 13px; }
+    .chat-head small { opacity: .76; font-size: 10px; }
+    .chat-close { margin-left: auto; border: 0; color: white; background: transparent; cursor: pointer; font-size: 19px; }
+    .chat-messages { max-height: 350px; overflow-y: auto; padding: 14px; background: #f7faff; }
+    .bubble { max-width: 85%; margin-bottom: 10px; padding: 10px 12px; border-radius: 12px; color: #42536e; background: white; border: 1px solid var(--line); font-size: 12px; line-height: 1.55; }
+    .bubble.user { margin-left: auto; color: white; background: #5870fb; border-color: #5870fb; border-bottom-right-radius: 3px; }
+    .bubble.ai { border-bottom-left-radius: 3px; }
+    .bubble b { color: #24344f; }
+    .chat-input { display: flex; gap: 8px; padding: 11px; border-top: 1px solid var(--line); background: white; }
+    .chat-input input { min-width: 0; flex: 1; padding: 10px 11px; border: 1px solid var(--line-strong); border-radius: 9px; outline: none; color: #334762; background: #fbfdff; font-size: 12px; }
+    .chat-input button { width: 38px; border: 0; border-radius: 9px; color: white; background: var(--purple); cursor: pointer; font-weight: 900; }
+    .chat-launch {
+      position: fixed; right: 22px; bottom: 22px; z-index: 26; width: 54px; height: 54px; border: 0; border-radius: 50%;
+      color: white; background: linear-gradient(145deg, #3754ed, #667cff); box-shadow: 0 0 0 5px rgba(79, 103, 255, .13), 0 8px 25px rgba(55, 84, 237, .4);
+      cursor: pointer; font-size: 21px;
+    }
+    .demo-switcher { right: 88px; }
+    .demo-toggle { width: 42px; height: 42px; font-size: 17px; box-shadow: 0 8px 20px rgba(64, 48, 255, .24); }
+
+    /* Shared */
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 13px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 99px;
+      background: rgba(108, 92, 255, .12); color: #8277ff; font-size: 10px; font-weight: 800;
+      letter-spacing: .05em; text-transform: uppercase;
+    }
+    .tag.green { background: rgba(19, 204, 160, .1); color: var(--green); }
+    .tag.orange { background: rgba(247, 146, 54, .12); color: var(--orange); }
+    .tag.red { background: rgba(240, 91, 112, .1); color: var(--red); }
+    .icon {
+      display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 9px;
+      background: #15243a; color: #9bacbf; font-size: 15px;
+    }
+    .chat {
+      position: fixed; z-index: 20; right: 20px; bottom: 20px; width: 46px; height: 46px;
+      display: grid; place-items: center; border: 0; border-radius: 50%; color: white;
+      background: linear-gradient(145deg, var(--purple), #4228ff); box-shadow: 0 0 22px rgba(87, 68, 255, .7);
+      cursor: pointer; font-size: 18px;
+    }
+    .demo-switcher + .chat { display: none; }
+
+    /* Shop */
+    .shop-topbar {
+      height: 48px; display: flex; align-items: center; gap: 22px; padding: 0 9%;
+      border-top: 1px solid #c79b41; border-bottom: 1px solid var(--line);
+      background: #091426; color: var(--muted); font-size: 11px;
+    }
+    .shop-logo { margin-right: 6px; color: white; font-size: 14px; font-weight: 900; letter-spacing: -.04em; }
+    .shop-topbar .spacer { flex: 1; }
+    .search {
+      display: flex; align-items: center; gap: 7px; min-width: 250px; padding: 7px 14px;
+      border-radius: 99px; background: #15243a; color: var(--muted); font-size: 10px;
+    }
+    .avatar { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 50%; background: var(--purple); color: white; font-size: 10px; }
+    .categories {
+      display: flex; gap: 10px; padding: 11px 9%; overflow-x: auto; border-bottom: 1px solid var(--line); background: #091426;
+    }
+    .category {
+      flex: 0 0 auto; padding: 6px 13px; border: 1px solid var(--line); border-radius: 99px;
+      color: #8291aa; font-size: 9px; font-weight: 800; text-transform: uppercase;
+    }
+    .category.active { color: #0c1626; background: white; }
+    .hero { padding: 42px 20px 28px; text-align: center; }
+    .hero-note { margin-bottom: 14px; font-size: 8px; letter-spacing: .16em; }
+    .hero h1 { margin: 0; font-size: clamp(34px, 4vw, 55px); line-height: 1.05; letter-spacing: -.055em; }
+    .hero h1 span { display: block; margin-top: 8px; color: var(--purple); }
+    .hero p { margin: 20px 0 0; color: var(--muted); font-size: 13px; }
+    .book-grid {
+      display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px;
+      width: min(1180px, 88%); margin: 24px auto 60px;
+    }
+    .book-card { padding: 9px; transition: .2s ease; }
+    .book-card:hover { transform: translateY(-4px); border-color: rgba(108, 92, 255, .5); }
+    .book-cover {
+      position: relative; height: 158px; overflow: hidden; border-radius: 8px;
+      background: linear-gradient(145deg, #eef6ff, #dcecff);
+    }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+    .book-card:hover .book-cover img { transform: scale(1.06); }
+    .book-card h3 { min-height: 32px; margin: 11px 0 4px; color: #dce5f2; font-size: 11px; }
+    .book-card footer { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+    .book-card .money { font-size: 12px; }
+    .stock { color: var(--green); padding: 3px 6px; border-radius: 99px; background: rgba(19, 204, 160, .08); font-size: 8px; }
+    .cart-wrap { width: min(1120px, 90%); margin: 36px auto 70px; }
+    .cart-title { margin: 0 0 6px; font-size: 26px; letter-spacing: -.04em; }
+    .cart-layout { display: grid; grid-template-columns: 1fr 300px; gap: 22px; align-items: start; margin-top: 24px; }
+    .cart-items { padding: 0 18px; }
+    .cart-item { display: flex; align-items: center; gap: 16px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .cart-item:last-child { border-bottom: 0; }
+    .cart-image { width: 82px; height: 72px; border-radius: 9px; object-fit: cover; background: #edf5ff; }
+    .cart-item h3 { margin: 0 0 5px; color: #263751; font-size: 14px; }
+    .cart-info { flex: 1; }
+    .quantity { display: inline-flex; align-items: center; gap: 10px; margin-top: 9px; padding: 4px 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 11px; }
+    .remove { margin-left: 12px; border: 0; color: var(--red); background: transparent; cursor: pointer; font-size: 17px; }
+    .cart-summary { padding: 18px; }
+    .cart-summary .primary { margin-top: 16px; }
+    .ai-recommend { margin-top: 24px; padding: 18px; border-color: rgba(79, 103, 255, .25); background: linear-gradient(110deg, #f7f9ff, #eef4ff); }
+    .ai-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+    .ai-head h2 { margin: 0; color: #24344f; font-size: 16px; }
+    .recommend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .recommend-card { display: flex; align-items: center; gap: 11px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+    .recommend-card img { width: 66px; height: 58px; border-radius: 8px; object-fit: cover; }
+    .recommend-card h4 { margin: 0 0 4px; color: #2b3c57; font-size: 11px; }
+    .recommend-card p { margin: 0 0 5px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+    .auth-screen { display: none; min-height: 100vh; place-items: center; padding: 28px; background: radial-gradient(circle at 20% 20%, rgba(79,103,255,.16), transparent 32%), #f4f8ff; }
+    .auth-screen.active { display: grid; }
+    .auth-card { display: grid; grid-template-columns: 1fr 1fr; width: min(880px, 100%); overflow: hidden; border-radius: 18px; background: white; box-shadow: 0 25px 65px rgba(58,82,124,.18); }
+    .auth-brand { display: flex; flex-direction: column; justify-content: space-between; min-height: 540px; padding: 36px; color: white; background: linear-gradient(145deg, #2946d9, #7488ff); }
+    .auth-brand h1 { margin: 18px 0 12px; font-size: 38px; letter-spacing: -.06em; line-height: 1.05; }
+    .auth-brand p { max-width: 330px; color: rgba(255,255,255,.82); font-size: 13px; line-height: 1.7; }
+    .auth-feature { display: flex; gap: 10px; align-items: center; margin-top: 12px; color: rgba(255,255,255,.86); font-size: 12px; }
+    .auth-form { padding: 38px; }
+    .auth-form h2 { margin: 0 0 7px; color: #23344e; font-size: 26px; letter-spacing: -.04em; }
+    .auth-form > p { margin: 0 0 24px; color: var(--muted); font-size: 12px; }
+    .auth-form label { display: block; margin-top: 14px; color: #53647c; font-size: 11px; font-weight: 800; }
+    .auth-form input { width: 100%; margin-top: 7px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 8px; outline: none; color: #334762; background: #fbfdff; }
+    .auth-form input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(79,103,255,.1); }
+    .auth-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; color: var(--muted); font-size: 11px; }
+    .auth-row a, .auth-bottom a { color: var(--purple); font-weight: 800; }
+    .auth-submit { display: block; width: 100%; margin-top: 20px; padding: 13px; border: 0; border-radius: 8px; color: white; background: linear-gradient(90deg, var(--purple-2), var(--purple)); cursor: pointer; font-weight: 800; text-align: center; }
+    .auth-bottom { margin-top: 20px; color: var(--muted); text-align: center; font-size: 12px; }
+
+    /* Checkout */
+    .checkout-head {
+      height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 8%;
+      border-top: 1px solid #c79b41; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px;
+    }
+    .checkout-head strong { color: white; font-size: 15px; }
+    .checkout-wrap { width: min(850px, 86%); margin: 42px auto; }
+    .steps { display: flex; justify-content: center; gap: 18px; margin-bottom: 52px; }
+    .step { display: flex; align-items: center; gap: 8px; color: var(--muted-2); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .step::after { content: ""; width: 42px; height: 1px; margin-left: 10px; background: var(--line); }
+    .step:last-child::after { display: none; }
+    .step b { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--line-strong); border-radius: 50%; }
+    .step.active { color: var(--purple); }
+    .step.active b { border-color: var(--purple); }
+    .checkout-grid { display: grid; grid-template-columns: 1fr 255px; gap: 38px; }
+    .form-title { margin: 0 0 24px; font-size: 19px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    label.field span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .field input, .field textarea {
+      width: 100%; padding: 13px 14px; color: #ced9e9; background: transparent;
+      border: 1px solid var(--line); border-radius: 9px; outline: none;
+    }
+    .field textarea { height: 80px; resize: none; }
+    .field.full { grid-column: 1 / -1; }
+    .primary {
+      width: 100%; margin-top: 28px; padding: 14px; border: 0; border-radius: 8px; cursor: pointer;
+      color: white; background: linear-gradient(90deg, var(--purple-2), var(--purple)); font-size: 12px; font-weight: 800;
+      box-shadow: 0 8px 20px rgba(81, 64, 234, .22);
+    }
+    .summary { padding: 20px; }
+    .summary h3 { margin: 0 0 15px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    .summary-line { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; color: var(--muted); font-size: 11px; }
+    .summary-line b { color: #dae3f1; white-space: nowrap; }
+    .summary-total { display: flex; justify-content: space-between; margin-top: 9px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .summary-total b { color: #7f75ff; font-size: 19px; }
+
+    /* Customer order detail */
+    .order-wrap { width: min(780px, 86%); margin: 28px auto; }
+    .back { display: block; margin-bottom: 26px; color: var(--muted); font-size: 11px; }
+    .order-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+    .order-title-row h1 { display: flex; align-items: center; gap: 12px; margin: 0 0 5px; font-size: 23px; }
+    .order-date { color: var(--muted); font-size: 10px; text-align: right; text-transform: uppercase; letter-spacing: .08em; }
+    .order-main { display: grid; grid-template-columns: 1fr 220px; gap: 22px; }
+    .block-title { padding: 16px 18px; border-bottom: 1px solid var(--line); color: #d4deec; font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .line-item { display: flex; align-items: center; gap: 14px; padding: 17px 18px; border-bottom: 1px solid var(--line); }
+    .line-item:last-child { border-bottom: 0; }
+    .mini-cover { width: 45px; height: 51px; border-radius: 7px; object-fit: cover; background: #edf5ff; }
+    .line-item h4 { margin: 0 0 4px; color: #dce5f3; font-size: 11px; }
+    .line-item .money { margin-left: auto; font-size: 11px; }
+    .cost { padding: 19px; }
+    .cost .summary-total b { font-size: 17px; }
+    .updated { margin-top: 24px; padding: 14px 8px; border-radius: 8px; background: #132138; color: var(--muted); text-align: center; font-size: 9px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; width: calc(100% - 242px); margin-top: 18px; }
+    .info-card { padding: 18px; min-height: 130px; }
+    .info-card h3 { margin: 0 0 15px; color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .info-card p { color: #bdcadb; font-size: 11px; line-height: 1.7; }
+
+    /* Admin */
+    .admin { display: grid; grid-template-columns: 190px 1fr; min-height: 100vh; }
+    .sidebar {
+      display: flex; flex-direction: column; padding: 16px 11px; border-right: 1px solid var(--line); background: #091426;
+    }
+    .admin-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; font-weight: 900; }
+    .admin-brand b { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 9px; background: var(--purple-2); font-size: 11px; }
+    .side-link { display: flex; align-items: center; gap: 10px; padding: 10px; color: #8191ab; border-radius: 8px; font-size: 12px; }
+    .side-link.active, .side-link:hover { color: var(--purple); background: rgba(108, 92, 255, .12); }
+    .staff { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+    .staff-person { display: flex; gap: 9px; align-items: center; margin-bottom: 20px; font-size: 11px; }
+    .admin-main { min-width: 0; padding: 24px 28px; }
+    .page-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 30px; }
+    .page-head h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.04em; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+    .tab {
+      padding: 9px 16px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
+      background: transparent; cursor: pointer; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    }
+    .tab.active { color: white; border-color: transparent; background: linear-gradient(90deg, var(--purple-2), var(--purple)); }
+    .orders-table { width: 100%; overflow: hidden; border-collapse: collapse; }
+    .orders-table th, .orders-table td { padding: 14px 18px; border-bottom: 1px solid var(--line); text-align: left; font-size: 11px; }
+    .orders-table th { color: var(--muted); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+    .actions { color: #6992be; letter-spacing: 7px; white-space: nowrap; }
+
+    /* Shipping */
+    .ship-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .ship-card { padding: 18px; }
+    .ship-card header { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 900; }
+    .ship-card .money { color: var(--purple); }
+    .ship-card p { color: var(--muted); font-size: 10px; }
+    .ship-card hr { height: 1px; margin: 16px 0 12px; border: 0; background: var(--line); }
+    .ship-card button { width: 100%; padding: 9px; border: 0; border-radius: 7px; color: var(--blue); background: #0d2545; cursor: pointer; font-size: 11px; }
+
+    /* Dashboard */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .stat { padding: 18px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; }
+    .stat p { margin: 12px 0 2px; color: var(--muted); font-size: 11px; }
+    .stat strong { font-size: 20px; }
+    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-top: 28px; }
+    .chart-card, .latest { padding: 18px; }
+    .chart-card h3, .latest h3 { margin: 0 0 18px; font-size: 14px; }
+    .chart { width: 100%; height: 250px; }
+    .latest-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .latest-row:last-child { border: 0; }
+    .latest-dot { width: 25px; height: 25px; border-radius: 50%; background: #15263d; }
+    .latest-row .money { margin-left: auto; font-size: 10px; }
+    .product-table { margin-top: 28px; padding: 18px; }
+    .product-table header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .product-table h3 { margin: 0; font-size: 14px; }
+
+    @media (max-width: 1000px) {
+      .book-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .ship-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .shop-topbar { padding: 0 4%; }
+      .shop-topbar > a, .shop-topbar .search { display: none; }
+      .categories { padding-inline: 4%; }
+      .book-grid { width: 92%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .checkout-grid, .order-main, .dash-grid { grid-template-columns: 1fr; }
+      .cart-layout { grid-template-columns: 1fr; }
+      .recommend-grid { grid-template-columns: 1fr; }
+      .auth-card { grid-template-columns: 1fr; }
+      .auth-brand { display: none; }
+      .auth-form { padding: 28px 20px; }
+      .checkout-wrap, .order-wrap { width: 92%; }
+      .steps { gap: 7px; }
+      .step::after { width: 12px; margin-left: 0; }
+      .step { font-size: 8px; gap: 4px; }
+      .info-grid { width: 100%; grid-template-columns: 1fr; }
+      .admin { grid-template-columns: 1fr; }
+      .sidebar { flex-direction: row; align-items: center; gap: 4px; overflow-x: auto; padding: 10px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .admin-brand { margin: 0 10px 0 0; }
+      .admin-brand span, .side-link span, .staff { display: none; }
+      .admin-main { padding: 18px 12px; }
+      .orders-table { min-width: 720px; }
+      .card-scroll { overflow-x: auto; }
+      .ship-grid { grid-template-columns: 1fr; }
+      .stats { gap: 10px; }
+      .stat { padding: 13px; }
+      .stat strong { font-size: 16px; }
+      .demo-switcher { right: 82px; bottom: 18px; }
+      .chatbot { right: 14px; bottom: 82px; }
+      .chat-launch { right: 16px; bottom: 16px; }
+    }
+
+    /* Light technology storefront theme */
+    :root {
+      --bg: #f4f8ff; --bg-soft: #edf4ff; --panel: #ffffff; --panel-2: #f8fbff;
+      --line: rgba(69, 98, 136, .13); --line-strong: rgba(69, 98, 136, .24);
+      --text: #17243a; --muted: #71829b; --muted-2: #a0aec0;
+      --purple: #4f67ff; --purple-2: #3754ed; --blue: #2176ff; --green: #00a982;
+      --shadow: 0 18px 50px rgba(65, 92, 135, .15);
+    }
+    body { background: var(--bg); color: var(--text); }
+    .card { box-shadow: 0 8px 22px rgba(77, 107, 151, .055); }
+    .shop-topbar, .categories, .checkout-head, .sidebar { background: rgba(255, 255, 255, .94); border-top-color: #dbe7f6; }
+    .shop-logo, .checkout-head strong, .page-head h1, .form-title, .chart-card h3, .latest h3, .product-table h3 { color: #17243a; }
+    .search, .icon, .updated { background: #edf4fc; }
+    .category { color: #657792; background: #f8fbff; }
+    .category.active { color: white; background: linear-gradient(90deg, var(--purple-2), var(--purple)); }
+    .hero { background: radial-gradient(circle at 50% 20%, rgba(102, 148, 255, .16), transparent 45%); }
+    .book-card h3, .line-item h4 { color: #263751; }
+    .field input, .field textarea { color: #334762; background: #fff; }
+    .orders-table td { color: #41536c; }
+    .admin-brand { color: #21324c; }
+    .summary-line b, .block-title, .info-card p { color: #40536e; }
+    .ship-card button { background: #eaf3ff; }
+    .demo-menu { background: rgba(255, 255, 255, .98); }
+    .demo-menu a { color: #637590; }
+    .demo-menu a:hover, .demo-menu a.current { color: var(--purple); }
+  </style>
+</head>
+<body>
+  <div class="demo-switcher" id="switcher">
+    <nav class="demo-menu">
+      <a href="#catalog" data-page="catalog">⌂ Cửa hàng công nghệ</a>
+      <a href="#login" data-page="login">♙ Đăng nhập</a>
+      <a href="#register" data-page="register">＋ Đăng ký</a>
+      <a href="#cart" data-page="cart">🛒 Giỏ hàng & AI gợi ý</a>
+      <a href="#checkout" data-page="checkout">✓ Checkout</a>
+      <a href="#order-detail" data-page="order-detail">☷ Chi tiết đơn hàng</a>
+      <a href="#orders" data-page="orders">▤ Quản lý đơn hàng</a>
+      <a href="#shipping" data-page="shipping">▱ Vận chuyển</a>
+      <a href="#dashboard" data-page="dashboard">◈ Dashboard quản trị</a>
+      <a href="#products-admin" data-page="products-admin">◇ Quản lý sản phẩm</a>
+      <a href="#users" data-page="users">♧ Quản lý người dùng</a>
+    </nav>
+    <!-- <button class="demo-toggle" title="Chuyển màn hình demo" onclick="toggleMenu()">☰</button> -->
+  </div>
+  <section class="chatbot" id="chatbot">
+    <header class="chat-head">
+      <span class="chat-avatar">✦</span>
+      <div><strong>Tech AI Assistant</strong><small>● Đang trực tuyến · Tư vấn laptop</small></div>
+      <button class="chat-close" title="Đóng chatbot" onclick="toggleChat()">×</button>
+    </header>
+    <div class="chat-messages" id="chatMessages">
+      <div class="bubble ai">Xin chào! Tôi là trợ lý AI của VinhShop Tech Store. Tôi có thể tư vấn laptop theo nhu cầu và ngân sách của bạn.</div>
+      <div class="bubble user">Tôi cần laptop gọn nhẹ để làm việc, lập trình và chỉnh sửa ảnh cơ bản. Ngân sách khoảng 35 triệu.</div>
+      <div class="bubble ai"><b>MacBook Air M3</b> là lựa chọn phù hợp nhất: thiết kế nhẹ, pin lâu, hiệu năng tốt cho lập trình và chỉnh ảnh cơ bản. Bản 16 GB RAM phù hợp để dùng lâu dài. Giá tham khảo: <b>35.990.000 ₫</b>.</div>
+      <div class="bubble user">Máy có phù hợp để mang đi làm mỗi ngày không?</div>
+      <div class="bubble ai">Có. MacBook Air M3 nặng khoảng 1,24 kg, không dùng quạt nên vận hành yên tĩnh. Với nhu cầu di chuyển thường xuyên, đây là ưu điểm rõ rệt so với laptop gaming.</div>
+    </div>
+    <form class="chat-input" onsubmit="sendChat(event)">
+      <input id="chatQuestion" placeholder="Hỏi AI về laptop..." autocomplete="off">
+      <button title="Gửi câu hỏi">➤</button>
+    </form>
+  </section>
+  <button class="chat-launch" title="Mở chatbot AI" onclick="toggleChat()">✦</button>
+
+  <main id="login" class="screen auth-screen">
+    <section class="auth-card">
+      <aside class="auth-brand">
+        <div><b>VINHSHOP · TECH STORE</b><h1>Công nghệ<br>cho tương lai.</h1><p>Đăng nhập để theo dõi đơn hàng, lưu sản phẩm yêu thích và nhận tư vấn thiết bị phù hợp từ AI.</p></div>
+        <div><div class="auth-feature">✦ &nbsp; AI tư vấn laptop theo nhu cầu</div><div class="auth-feature">✓ &nbsp; Sản phẩm công nghệ chính hãng</div><div class="auth-feature">♢ &nbsp; Thanh toán và vận chuyển an toàn</div></div>
+      </aside>
+      <form class="auth-form" onsubmit="submitAuth(event)">
+        <h2>Đăng nhập</h2><p>Chào mừng bạn quay lại VinhShop Tech Store.</p>
+        <label>Email<input type="email" value="john@example.com" required></label>
+        <label>Mật khẩu<input type="password" value="12345678" required></label>
+        <div class="auth-row"><span><input type="checkbox" checked style="width:auto;margin:0 5px 0 0">Ghi nhớ đăng nhập</span><a href="#login">Quên mật khẩu?</a></div>
+        <button class="auth-submit">ĐĂNG NHẬP</button>
+        <div class="auth-bottom">Chưa có tài khoản? <a href="#register">Đăng ký ngay</a></div>
+      </form>
+    </section>
+  </main>
+
+  <main id="register" class="screen auth-screen">
+    <section class="auth-card">
+      <aside class="auth-brand">
+        <div><b>VINHSHOP · TECH STORE</b><h1>Tham gia<br>hệ sinh thái.</h1><p>Tạo tài khoản để khám phá ưu đãi cá nhân hóa và gợi ý công nghệ được hỗ trợ bởi AI.</p></div>
+        <div><div class="auth-feature">✦ &nbsp; Gợi ý phụ kiện thông minh</div><div class="auth-feature">✓ &nbsp; Theo dõi trạng thái đơn hàng</div><div class="auth-feature">♢ &nbsp; Lưu địa chỉ giao hàng tiện lợi</div></div>
+      </aside>
+      <form class="auth-form" onsubmit="submitAuth(event)">
+        <h2>Tạo tài khoản</h2><p>Điền thông tin để bắt đầu mua sắm.</p>
+        <label>Họ và tên<input type="text" placeholder="Nguyễn Văn An" required></label>
+        <label>Email<input type="email" placeholder="name@example.com" required></label>
+        <label>Mật khẩu<input type="password" placeholder="Tối thiểu 8 ký tự" required></label>
+        <label>Xác nhận mật khẩu<input type="password" placeholder="Nhập lại mật khẩu" required></label>
+        <button class="auth-submit">ĐĂNG KÝ TÀI KHOẢN</button>
+        <div class="auth-bottom">Đã có tài khoản? <a href="#login">Đăng nhập</a></div>
+      </form>
+    </section>
+  </main>
+
+  <main id="catalog" class="screen">
+    <header class="shop-topbar">
+      <a class="shop-logo" href="#catalog">VinhShop</a>
+      <a href="#catalog">Catalog</a><a href="#orders">Đơn hàng</a>
+      <span class="spacer"></span><span class="search">⌕ &nbsp; Tìm kiếm sản phẩm...</span>
+      <a href="#cart">🛒</a><b class="avatar">J</b><span>⇥</span>
+    </header>
+    <nav class="categories">
+      <a class="category active">Tất cả</a><a class="category">Điện thoại</a><a class="category">Laptop</a>
+      <a class="category">Tablet</a><a class="category">Đồng hồ thông minh</a><a class="category">Âm thanh</a>
+      <a class="category">Gaming</a><a class="category">Camera</a><a class="category">Phụ kiện</a>
+    </nav>
+    <section class="hero">
+      <span class="tag hero-note">Microservices demo architecture</span>
+      <h1>THE NEXT GEN <span>TECH STORE</span></h1>
+      <p>Khám phá hệ sinh thái công nghệ hiện đại, từ thiết bị di động đến phụ kiện thông minh.</p>
+    </section>
+    <section class="book-grid" id="bookGrid"></section>
+  </main>
+
+  <main id="cart" class="screen">
+    <header class="shop-topbar">
+      <a class="shop-logo" href="#catalog">VinhShop</a><a href="#catalog">Catalog</a><a href="#orders">Đơn hàng</a>
+      <span class="spacer"></span><span class="search">⌕ &nbsp; Tìm kiếm sản phẩm...</span><span>🛒</span><b class="avatar">J</b>
+    </header>
+    <section class="cart-wrap">
+      <h1 class="cart-title">Giỏ hàng của bạn</h1><span class="muted">3 sản phẩm đã được chọn. AI đang phân tích để gợi ý phụ kiện phù hợp.</span>
+      <div class="cart-layout">
+        <section class="card cart-items" id="cartItems"></section>
+        <aside class="card cart-summary">
+          <h3 style="margin:0 0 12px">Tóm tắt đơn hàng</h3>
+          <div class="summary-line"><span>Tạm tính</span><b>71.470.000 ₫</b></div>
+          <div class="summary-line"><span>Phí vận chuyển</span><b class="green">Miễn phí</b></div>
+          <div class="summary-line"><span>Ưu đãi thành viên</span><b class="green">-0 ₫</b></div>
+          <div class="summary-total"><span>Tổng cộng</span><b>71.470.000 ₫</b></div>
+          <a class="primary" href="#checkout" style="display:block;text-align:center">TIẾN HÀNH CHECKOUT &nbsp; ›</a>
+        </aside>
+      </div>
+      <section class="card ai-recommend">
+        <header class="ai-head"><div><h2>✦ AI gợi ý cho bạn</h2><span class="tiny">Dựa trên laptop và thiết bị đang có trong giỏ hàng</span></div><span class="tag">AI Personalized</span></header>
+        <div class="recommend-grid" id="recommendGrid"></div>
+      </section>
+    </section>
+  </main>
+
+  <main id="checkout" class="screen">
+    <header class="checkout-head"><a href="#cart">← &nbsp; QUAY LẠI GIỎ HÀNG</a><strong>CHECKOUT</strong><span class="green">♢ &nbsp; SECURE CHECKOUT</span></header>
+    <section class="checkout-wrap">
+      <div class="steps"><span class="step active"><b>1</b> VẬN CHUYỂN</span><span class="step"><b>2</b> THANH TOÁN</span><span class="step"><b>3</b> XÁC NHẬN</span></div>
+      <div class="checkout-grid">
+        <div>
+          <h2 class="form-title"><span class="purple">⌖</span> &nbsp;Địa chỉ giao hàng</h2>
+          <div class="form-grid">
+            <label class="field"><span>Tỉnh / Thành phố</span><input value="Hồ Chí Minh"></label>
+            <label class="field"><span>Quận / Huyện</span><input value="Quận 1"></label>
+            <label class="field full"><span>Địa chỉ chi tiết (số nhà, tên đường, phường)</span><textarea>123 Lê Lợi, Phường Bến Nghé</textarea></label>
+          </div>
+          <button class="primary">TIẾP TỤC: THANH TOÁN &nbsp; ›</button>
+        </div>
+        <aside class="card summary">
+          <h3><span class="purple">▣</span> &nbsp; Tóm tắt đơn hàng</h3>
+          <div class="summary-line"><span>MacBook Air M3 × 1</span><b>35.990.000 ₫</b></div>
+          <div class="summary-line"><span>iPhone 15 Pro × 1</span><b>27.990.000 ₫</b></div>
+          <div class="summary-line"><span>Sony WH-1000XM5 × 1</span><b>7.490.000 ₫</b></div>
+          <div class="summary-total"><span>Tổng tiền</span><b>71.470.000 ₫</b></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <main id="order-detail" class="screen">
+    <header class="checkout-head"><a href="#orders">← &nbsp; LỊCH SỬ ĐƠN HÀNG</a><span></span><span></span></header>
+    <section class="order-wrap">
+      <div class="order-title-row">
+        <div><h1>Chi tiết đơn hàng <span class="tag orange">Approval Pending</span></h1><span class="tiny">#ORD-13</span></div>
+        <div class="order-date">Ngày đặt hàng<br><b style="color:#d5dfed;line-height:2">11 tháng 5, 2026</b></div>
+      </div>
+      <div class="order-main">
+        <section class="card">
+          <div class="block-title"><span class="purple">◇</span> &nbsp; Sản phẩm (3)</div>
+          <div id="detailItems"></div>
+        </section>
+        <aside class="card cost">
+          <div class="tiny" style="font-weight:900;text-transform:uppercase;letter-spacing:.08em">Tóm tắt chi phí</div>
+          <div class="summary-line"><span>Tạm tính</span><b>71.470.000 ₫</b></div>
+          <div class="summary-line"><span>Giảm giá</span><b class="green">-0 ₫</b></div>
+          <div class="summary-line"><span>Phí giao hàng</span><b class="green">MIỄN PHÍ</b></div>
+          <div class="summary-total"><span>Tổng cộng</span><b>71.470.000 ₫</b></div>
+          <div class="updated">◷ CẬP NHẬT MỚI NHẤT<br><small>11 tháng 5, 2026</small></div>
+        </aside>
+      </div>
+      <div class="info-grid">
+        <article class="card info-card"><h3><span class="purple">⌖</span> &nbsp; Địa chỉ giao hàng</h3><p>123 Lê Lợi, Phường Bến Nghé,<br>Quận 1, Hồ Chí Minh</p><hr style="border-color:var(--line)"><b class="tiny">PHƯƠNG THỨC</b><p>Standard</p></article>
+        <article class="card info-card"><h3><span class="purple">▣</span> &nbsp; Thanh toán</h3><p>Thanh toán khi nhận hàng</p><hr style="border-color:var(--line)"><b class="tiny">TRẠNG THÁI THANH TOÁN</b><p class="green" style="font-weight:800">ĐANG CHỜ XÁC NHẬN</p></article>
+      </div>
+    </section>
+  </main>
+
+  <main id="orders" class="screen admin">
+    <aside class="sidebar" data-active="orders"></aside>
+    <section class="admin-main">
+      <header class="page-head">
+        <div><h1>Quản lý Đơn hàng</h1><span class="muted">Xử lý và theo dõi quy trình vận chuyển.</span></div>
+        <span class="search">⌕ &nbsp; Tìm ID đơn hàng...</span>
+      </header>
+      <div class="tabs"><button class="tab active">Tất cả</button><button class="tab">Pending</button><button class="tab">Approved</button><button class="tab">Shipping</button><button class="tab">Delivered</button></div>
+      <div class="card card-scroll"><table class="orders-table"><thead><tr><th>ID đơn</th><th>Ngày đặt</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+    </section>
+  </main>
+
+  <main id="shipping" class="screen admin">
+    <aside class="sidebar" data-active="shipping"></aside>
+    <section class="admin-main">
+      <header class="page-head"><div><h1>Vận chuyển &amp; Giao nhận</h1><span class="muted">Quản lý đóng gói, lấy hàng và theo dõi vận trình.</span></div></header>
+      <div class="tabs"><button class="tab active">◷ &nbsp; Chờ lấy hàng</button><button class="tab">▱ &nbsp; Đang giao</button><button class="tab">✓ &nbsp; Đã giao thành công</button></div>
+      <section class="ship-grid" id="shipGrid"></section>
+    </section>
+  </main>
+
+  <main id="dashboard" class="screen admin">
+    <aside class="sidebar" data-active="dashboard"></aside>
+    <section class="admin-main">
+      <header class="page-head"><div><h1>Tổng quan</h1><span class="muted">Phân tích hiệu suất hệ thống thời gian thực.</span></div><div><button class="tab">▽ Bộ lọc</button> <button class="tab active">⌁ Báo cáo</button></div></header>
+      <section class="stats">
+        <article class="card stat"><div class="stat-top"><span class="icon">⌁</span><span class="tag green">↗ 12%</span></div><p>Tổng doanh thu</p><strong>128.450.000 ₫</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">🛒</span><span class="tag green">↗ 8%</span></div><p>Đơn hàng</p><strong>1,280</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">♧</span><span class="tag green">↗ 24%</span></div><p>Khách hàng</p><strong>3,504</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">◇</span><span class="tag red">↘ 2%</span></div><p>Sản phẩm</p><strong>798</strong></article>
+      </section>
+      <section class="dash-grid">
+        <article class="card chart-card"><h3>Xu hướng doanh thu</h3>
+          <svg class="chart" viewBox="0 0 700 250" preserveAspectRatio="none">
+            <defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#6957ff" stop-opacity=".35"/><stop offset="1" stop-color="#6957ff" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0 30 C100 65 155 95 230 145 S345 92 410 104 S510 175 590 150 S650 132 700 110 L700 240 L0 240Z" fill="url(#fill)"/>
+            <path d="M0 30 C100 65 155 95 230 145 S345 92 410 104 S510 175 590 150 S650 132 700 110" fill="none" stroke="#6957ff" stroke-width="3"/>
+            <g fill="#61718b" font-size="11"><text x="0" y="248">Jan</text><text x="135" y="248">Feb</text><text x="275" y="248">Mar</text><text x="415" y="248">Apr</text><text x="555" y="248">May</text><text x="680" y="248">Jun</text></g>
+          </svg>
+        </article>
+        <aside class="card latest"><h3>Đơn hàng mới nhất</h3><div id="latestOrders"></div></aside>
+      </section>
+    </section>
+  </main>
+
+  <main id="products-admin" class="screen admin">
+    <aside class="sidebar" data-active="products-admin"></aside>
+    <section class="admin-main">
+      <header class="page-head">
+        <div><h1>Quản lý Sản phẩm</h1><span class="muted">Quản lý danh mục, giá bán và tồn kho thiết bị công nghệ.</span></div>
+        <button class="tab active">＋ Thêm sản phẩm</button>
+      </header>
+      <section class="stats" style="margin-bottom:28px">
+        <article class="card stat"><div class="stat-top"><span class="icon">◇</span><span class="tag green">↗ 8%</span></div><p>Tổng sản phẩm</p><strong>798</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">✓</span><span class="tag green">95%</span></div><p>Đang kinh doanh</p><strong>756</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">!</span><span class="tag orange">18</span></div><p>Sắp hết hàng</p><strong>18</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">×</span><span class="tag red">24</span></div><p>Hết hàng</p><strong>24</strong></article>
+      </section>
+      <header class="page-head" style="margin-bottom:18px">
+        <div class="tabs" style="margin:0"><button class="tab active">Tất cả</button><button class="tab">Điện thoại</button><button class="tab">Laptop</button><button class="tab">Phụ kiện</button><button class="tab">Sắp hết hàng</button></div>
+        <span class="search">⌕ &nbsp; Tìm tên hoặc SKU...</span>
+      </header>
+      <div class="card card-scroll"><table class="orders-table"><thead><tr><th>Sản phẩm</th><th>SKU</th><th>Danh mục</th><th>Giá</th><th>Kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="productsAdminBody"></tbody></table></div>
+    </section>
+  </main>
+
+  <main id="users" class="screen admin">
+    <aside class="sidebar" data-active="users"></aside>
+    <section class="admin-main">
+      <header class="page-head">
+        <div><h1>Quản lý Người dùng</h1><span class="muted">Theo dõi tài khoản khách hàng và phân quyền hệ thống.</span></div>
+        <button class="tab active">＋ Thêm người dùng</button>
+      </header>
+      <section class="stats" style="margin-bottom:28px">
+        <article class="card stat"><div class="stat-top"><span class="icon">♧</span><span class="tag green">↗ 24%</span></div><p>Tổng tài khoản</p><strong>3,504</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">✓</span><span class="tag green">92%</span></div><p>Đang hoạt động</p><strong>3,227</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">✦</span><span class="tag">AI</span></div><p>Nhận gợi ý AI</p><strong>2,184</strong></article>
+        <article class="card stat"><div class="stat-top"><span class="icon">♙</span><span class="tag orange">12</span></div><p>Quản trị viên</p><strong>12</strong></article>
+      </section>
+      <header class="page-head" style="margin-bottom:18px">
+        <div class="tabs" style="margin:0"><button class="tab active">Tất cả</button><button class="tab">Khách hàng</button><button class="tab">Staff</button><button class="tab">Admin</button><button class="tab">Đã khóa</button></div>
+        <span class="search">⌕ &nbsp; Tìm tên hoặc email...</span>
+      </header>
+      <div class="card card-scroll"><table class="orders-table"><thead><tr><th>Người dùng</th><th>Email</th><th>Vai trò</th><th>Ngày tham gia</th><th>Đơn hàng</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </section>
+  </main>
+
+  <script>
+    const products = [
+      ["iPhone 15 Pro Max", "30.990.000 ₫", "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=500&q=80"],
+      ["MacBook Air M3", "35.990.000 ₫", "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=500&q=80"],
+      ["Apple Watch Series 9", "10.490.000 ₫", "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=500&q=80"],
+      ["Sony WH-1000XM5", "7.490.000 ₫", "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80"],
+      ["iPad Pro M4", "28.990.000 ₫", "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=500&q=80"],
+      ["PlayStation 5", "13.490.000 ₫", "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=500&q=80"],
+      ["Canon EOS R50", "18.990.000 ₫", "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80"],
+      ["Samsung Galaxy S24 Ultra", "31.990.000 ₫", "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=500&q=80"],
+      ["Mechanical Keyboard", "2.190.000 ₫", "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=500&q=80"],
+      ["Gaming Monitor 4K", "12.890.000 ₫", "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=500&q=80"],
+      ["JBL Flip 6", "2.890.000 ₫", "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=500&q=80"],
+      ["AirPods Pro", "5.990.000 ₫", "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=500&q=80"]
+    ];
+    const orderItems = [
+      ["MacBook Air M3", "Số lượng: 1", "35.990.000 ₫", products[1][2]],
+      ["iPhone 15 Pro", "Số lượng: 1", "27.990.000 ₫", products[0][2]],
+      ["Sony WH-1000XM5", "Số lượng: 1", "7.490.000 ₫", products[3][2]]
+    ];
+    const recommendations = [
+      ["AirPods Pro", "Kết nối nhanh với MacBook và iPhone.", "5.990.000 ₫", products[11][2]],
+      ["Apple Watch Series 9", "Hoàn thiện hệ sinh thái Apple cá nhân.", "10.490.000 ₫", products[2][2]],
+      ["Mechanical Keyboard", "Tăng trải nghiệm làm việc tại bàn.", "2.190.000 ₫", products[8][2]]
+    ];
+    const adminProducts = [
+      ["MacBook Air M3", "LAPTOP-APPLE-001", "Laptop", "35.990.000 ₫", "85", "ACTIVE", products[1][2]],
+      ["iPhone 15 Pro Max", "PHONE-APPLE-015", "Điện thoại", "30.990.000 ₫", "64", "ACTIVE", products[0][2]],
+      ["Samsung Galaxy S24 Ultra", "PHONE-SS-024", "Điện thoại", "31.990.000 ₫", "42", "ACTIVE", products[7][2]],
+      ["Sony WH-1000XM5", "AUDIO-SONY-005", "Âm thanh", "7.490.000 ₫", "12", "LOW_STOCK", products[3][2]],
+      ["iPad Pro M4", "TABLET-APPLE-004", "Tablet", "28.990.000 ₫", "35", "ACTIVE", products[4][2]],
+      ["PlayStation 5", "GAME-SONY-005", "Gaming", "13.490.000 ₫", "0", "OUT_OF_STOCK", products[5][2]],
+      ["Mechanical Keyboard", "ACCESSORY-KB-009", "Phụ kiện", "2.190.000 ₫", "118", "ACTIVE", products[8][2]]
+    ];
+    const orders = [
+      ["#ORD-13", "11 tháng 5, 2026", "Guest", "71.470.000 ₫", "APPROVAL_PENDING"],
+      ["#ORD-12", "27 tháng 4, 2026", "Guest", "24.990.000 ₫", "APPROVED"],
+      ["#ORD-11", "27 tháng 4, 2026", "Guest", "43.480.000 ₫", "APPROVED"],
+      ["#ORD-10", "27 tháng 4, 2026", "Guest", "13.490.000 ₫", "APPROVED"],
+      ["#ORD-9", "27 tháng 4, 2026", "Guest", "7.490.000 ₫", "APPROVED"],
+      ["#ORD-8", "27 tháng 4, 2026", "Guest", "31.990.000 ₫", "APPROVED"],
+      ["#ORD-7", "27 tháng 4, 2026", "Guest", "18.990.000 ₫", "APPROVED"],
+      ["#ORD-6", "27 tháng 4, 2026", "Guest", "10.490.000 ₫", "APPROVED"],
+      ["#ORD-5", "27 tháng 4, 2026", "Guest", "12.890.000 ₫", "APPROVED"],
+      ["#ORD-4", "27 tháng 4, 2026", "Guest", "35.990.000 ₫", "APPROVED"]
+    ];
+    const users = [
+      ["Nguyễn Minh Anh", "minhanh@example.com", "CUSTOMER", "08 tháng 5, 2026", "12", "ACTIVE"],
+      ["Trần Hoàng Nam", "hoangnam@example.com", "CUSTOMER", "02 tháng 5, 2026", "8", "ACTIVE"],
+      ["Lê Thu Hà", "thuha@example.com", "CUSTOMER", "27 tháng 4, 2026", "5", "ACTIVE"],
+      ["Phạm Quốc Bảo", "quocbao@example.com", "STAFF", "18 tháng 4, 2026", "—", "ACTIVE"],
+      ["Admin System", "admin@vinhtq.vn", "ADMIN", "01 tháng 3, 2026", "—", "ACTIVE"],
+      ["Võ Thành Đạt", "thanhdat@example.com", "CUSTOMER", "15 tháng 2, 2026", "2", "LOCKED"],
+      ["Ngô Phương Linh", "phuonglinh@example.com", "CUSTOMER", "09 tháng 2, 2026", "16", "ACTIVE"]
+    ];
+
+    document.getElementById("bookGrid").innerHTML = products.map(product => `
+      <article class="card book-card"><div class="book-cover"><img src="${product[2]}" alt="${product[0]}" loading="lazy"></div><h3>${product[0]}</h3>
+      <footer><span class="money">${product[1]}</span><span class="stock">Còn hàng</span></footer></article>`).join("");
+    document.getElementById("detailItems").innerHTML = orderItems.map(item => `
+      <div class="line-item"><img class="mini-cover" src="${item[3]}" alt="${item[0]}"><div><h4>${item[0]}</h4><span class="tiny">${item[1]}</span></div><b class="money">${item[2]}</b></div>`).join("");
+    document.getElementById("cartItems").innerHTML = orderItems.map(item => `
+      <article class="cart-item"><img class="cart-image" src="${item[3]}" alt="${item[0]}"><div class="cart-info"><h3>${item[0]}</h3><span class="tiny">Thiết bị công nghệ chính hãng · Bảo hành tiêu chuẩn</span><div><span class="quantity">− &nbsp; 1 &nbsp; +</span></div></div><b class="money">${item[2]}</b><button class="remove" title="Xóa sản phẩm">×</button></article>`).join("");
+    document.getElementById("recommendGrid").innerHTML = recommendations.map(item => `
+      <article class="recommend-card"><img src="${item[3]}" alt="${item[0]}"><div><h4>${item[0]}</h4><p>${item[1]}</p><b class="money">${item[2]}</b></div></article>`).join("");
+    document.getElementById("productsAdminBody").innerHTML = adminProducts.map(product => `
+      <tr><td><img class="mini-cover" src="${product[6]}" alt="${product[0]}" style="width:38px;height:38px;vertical-align:middle;margin-right:9px"><b>${product[0]}</b></td>
+      <td class="muted">${product[1]}</td><td><span class="tag">${product[2]}</span></td><td class="money">${product[3]}</td><td>${product[4]}</td>
+      <td><span class="tag ${product[5] === "ACTIVE" ? "green" : product[5] === "LOW_STOCK" ? "orange" : "red"}">${product[5]}</span></td><td class="actions">✎ ⋯</td></tr>`).join("");
+    document.getElementById("ordersBody").innerHTML = orders.map((o, i) => `
+      <tr><td>${o[0]}</td><td class="muted">${o[1]}</td><td><span class="avatar" style="display:inline-grid;margin-right:8px;background:#15263d">U</span>${o[2]}</td>
+      <td><b>${o[3]}</b></td><td><span class="tag ${i ? "" : "orange"}">${o[4]}</span></td><td class="actions">◉ ${i ? "▱" : ""}</td></tr>`).join("");
+    document.getElementById("shipGrid").innerHTML = orders.slice(1).map(o => `
+      <article class="card ship-card"><header><span>${o[0]}</span><span class="money">${o[3]}</span></header>
+      <p>${o[1]}</p><p>⌖ &nbsp; Hà Nội</p><hr><button>Xác nhận đã lấy hàng (Giao)</button></article>`).join("");
+    document.getElementById("latestOrders").innerHTML = orders.slice(0, 5).map(o => `
+      <div class="latest-row"><span class="latest-dot"></span><div><b>${o[0]}</b><div class="tiny">2 phút trước</div></div><span class="money">${o[3]}</span></div>`).join("");
+    document.getElementById("usersBody").innerHTML = users.map((user, index) => `
+      <tr><td><span class="avatar" style="display:inline-grid;margin-right:8px;background:${index === 4 ? "#4f67ff" : "#dfe9f7"};color:${index === 4 ? "white" : "#58708f"}">${user[0][0]}</span><b>${user[0]}</b></td>
+      <td class="muted">${user[1]}</td><td><span class="tag ${user[2] === "ADMIN" ? "orange" : ""}">${user[2]}</span></td><td class="muted">${user[3]}</td><td>${user[4]}</td>
+      <td><span class="tag ${user[5] === "ACTIVE" ? "green" : "red"}">${user[5]}</span></td><td class="actions">✎ ⋯</td></tr>`).join("");
+
+    const sidebars = document.querySelectorAll(".sidebar");
+    sidebars.forEach(sidebar => {
+      const active = sidebar.dataset.active;
+      sidebar.innerHTML = `
+        <a class="admin-brand" href="#dashboard"><b>AG</b><span>MANAGEMENT</span></a>
+        <a class="side-link ${active === "dashboard" ? "active" : ""}" href="#dashboard">◈ <span>Tổng quan</span></a>
+        <a class="side-link ${active === "products-admin" ? "active" : ""}" href="#products-admin">◇ <span>Sản phẩm</span></a>
+        <a class="side-link ${active === "users" ? "active" : ""}" href="#users">♧ <span>Người dùng</span></a>
+        <a class="side-link ${active === "orders" ? "active" : ""}" href="#orders">🛒 <span>Quản lý đơn hàng</span></a>
+        <a class="side-link ${active === "shipping" ? "active" : ""}" href="#shipping">▱ <span>Vận chuyển</span></a>
+        <div class="staff"><div class="staff-person"><b class="avatar" style="background:#17283f">S</b><span>Admin<br><small class="muted">admin</small></span></div><a class="side-link" href="#catalog">⇥ <span>Đăng xuất</span></a></div>`;
+    });
+
+    const pages = [...document.querySelectorAll(".screen")];
+    function showPage() {
+      const id = (location.hash || "#catalog").slice(1);
+      const selected = document.getElementById(id) || document.getElementById("catalog");
+      pages.forEach(page => page.classList.toggle("active", page === selected));
+      document.querySelectorAll(".demo-menu a").forEach(a => a.classList.toggle("current", a.dataset.page === selected.id));
+      document.getElementById("switcher").classList.remove("open");
+      window.scrollTo(0, 0);
+    }
+    function toggleMenu() { document.getElementById("switcher").classList.toggle("open"); }
+    function toggleChat() { document.getElementById("chatbot").classList.toggle("closed"); }
+    function sendChat(event) {
+      event.preventDefault();
+      const input = document.getElementById("chatQuestion");
+      const question = input.value.trim();
+      if (!question) return;
+      const messages = document.getElementById("chatMessages");
+      messages.insertAdjacentHTML("beforeend", `<div class="bubble user">${escapeHtml(question)}</div>`);
+      input.value = "";
+      const normalized = question.toLowerCase();
+      let answer = "Với nhu cầu laptop phổ thông, tôi đề xuất ưu tiên RAM từ <b>16 GB</b>, SSD từ <b>512 GB</b> và màn hình tốt. Bạn có thể cho tôi biết ngân sách và phần mềm thường dùng để tôi tư vấn sát hơn.";
+      if (normalized.includes("gaming") || normalized.includes("game")) {
+        answer = "Nếu ưu tiên gaming, bạn nên chọn laptop Windows có GPU rời RTX 4060 trở lên. MacBook Air M3 phù hợp công việc di động hơn nhưng không phải lựa chọn tối ưu cho game nặng.";
+      } else if (normalized.includes("pin") || normalized.includes("battery")) {
+        answer = "<b>MacBook Air M3</b> phù hợp khi cần pin lâu. Với tác vụ văn phòng và lập trình nhẹ, máy có thể đáp ứng một ngày làm việc mà không cần mang sạc liên tục.";
+      } else if (normalized.includes("ram") || normalized.includes("lập trình") || normalized.includes("code")) {
+        answer = "Để lập trình ổn định trong vài năm, nên chọn <b>16 GB RAM</b>. Nếu thường chạy Docker, máy ảo hoặc nhiều service cùng lúc, cấu hình <b>24 GB RAM</b> sẽ thoải mái hơn.";
+      } else if (normalized.includes("giá") || normalized.includes("ngân sách") || normalized.includes("triệu")) {
+        answer = "Trong tầm 35 triệu, <b>MacBook Air M3 16 GB RAM</b> là lựa chọn cân bằng cho công việc di động. Nếu cần GPU mạnh hơn, bạn nên xem thêm laptop Windows RTX 4060 cùng tầm giá.";
+      }
+      window.setTimeout(() => {
+        messages.insertAdjacentHTML("beforeend", `<div class="bubble ai">${answer}</div>`);
+        messages.scrollTop = messages.scrollHeight;
+      }, 350);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    function submitAuth(event) {
+      event.preventDefault();
+      location.hash = "#catalog";
+    }
+    window.addEventListener("hashchange", showPage);
+    showPage();
+  </script>
+</body>
+</html>

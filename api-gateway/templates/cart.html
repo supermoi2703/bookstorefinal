@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Giỏ hàng - ProductStore{% endblock %}
+
+{% block extra_head %}
+<style>
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 20px;
+    }
+
+    .cart-item-icon {
+        width: 46px;
+        height: 46px;
+        background: var(--green-50);
+        border: 1px solid var(--green-200);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .cart-item-info {
+        flex: 1;
+    }
+
+    .cart-item-title {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .cart-item-price {
+        font-size: 0.82rem;
+        color: var(--green-600);
+        font-weight: 600;
+    }
+
+    .cart-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .qty-form {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .qty-input {
+        width: 55px;
+        padding: 7px 8px;
+        background: var(--bg-white);
+        border: 1.5px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        text-align: center;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .qty-input:focus {
+        border-color: var(--green-400);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+        background: var(--bg-white);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+        background: #f1f5f9;
+    }
+
+    .btn-icon.danger:hover {
+        background: var(--danger-bg);
+        border-color: #fecaca;
+        color: var(--danger);
+    }
+
+    .cart-summary {
+        position: sticky;
+        top: 88px;
+        padding: 24px;
+        border: 1px solid var(--green-200);
+        background: linear-gradient(180deg, var(--green-50), #fff);
+    }
+
+    .cart-summary-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .cart-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        color: var(--text-body);
+        font-size: 0.88rem;
+    }
+
+    .cart-summary-row.total {
+        border-top: 1px solid var(--border-light);
+        margin-top: 10px;
+        padding-top: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-dark);
+    }
+
+    .cart-checkout-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        margin-top: 18px;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-cart-icon {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 16px;
+        opacity: 0.8;
+    }
+
+    .empty-cart-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+    }
+
+    .empty-cart-desc {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-summary {
+            position: static;
+        }
+
+        .cart-item {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h1 class="section-title">🛒 Giỏ <span class="highlight">hàng</span></h1>
+    <p class="section-subtitle">Quản lý sản phẩm trong giỏ hàng của bạn</p>
+</div>
+
+{% if message %}
+<div class="alert alert-success">{{ message }}</div>
+{% endif %}
+
+{% if items %}
+<div class="cart-layout">
+    <div class="cart-items">
+        {% for item in items %}
+        <div class="card cart-item">
+            <div class="cart-item-icon">📕</div>
+            <div class="cart-item-info">
+                <div class="cart-item-title">{{ item.product_title }}</div>
+                <div class="cart-item-price">${{ item.product_price }} / cuốn</div>
+            </div>
+            <div class="cart-item-actions">
+                <form method="post" action="{% url 'update_cart_item' item.id %}" class="qty-form">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="qty-input">
+                    <button type="submit" class="btn-icon" title="Cập nhật">✏️</button>
+                </form>
+                <form method="post" action="{% url 'remove_cart_item' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-icon danger" title="Xóa">🗑️</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card cart-summary">
+        <div class="cart-summary-title">📋 Tóm tắt đơn hàng</div>
+        <div class="cart-summary-row">
+            <span>Số sản phẩm</span>
+            <span>{{ items|length }}</span>
+        </div>
+        <div class="cart-summary-row total">
+            <span>Trạng thái</span>
+            <span style="color: var(--green-600);">✓ Sẵn sàng</span>
+        </div>
+        <a href="{% url 'checkout' %}" class="btn btn-primary cart-checkout-btn">
+            ✨ Tiến hành thanh toán
+        </a>
+    </div>
+</div>
+{% else %}
+<div class="card empty-cart">
+    <span class="empty-cart-icon">🛒</span>
+    <div class="empty-cart-title">Giỏ hàng trống</div>
+    <p class="empty-cart-desc">Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">📖 Xem sách ngay</a>
+</div>
+{% endif %}
+
+<!-- Recommendations block -->
+{% if graph_recommendations %}
+<div class="mt-4">
+    <div class="section-header" style="margin-top: 40px; margin-bottom: 24px;">
+        <h2 class="section-title">🎯 Gợi ý <span class="highlight">mua thêm</span></h2>
+        <p class="section-subtitle">Dựa trên các sản phẩm bạn quan tâm</p>
+    </div>
+    
+    <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% for rproduct in graph_recommendations %}
+        <div class="card" style="padding: 20px; transition: var(--transition);">
+            <div style="text-align: center; padding: 20px 0; background: var(--green-50); border-radius: var(--radius-md); margin-bottom: 12px; font-size: 2rem; position: relative;">
+                📗
+                <span class="badge badge-sale" style="position: absolute; top: 8px; right: 8px; font-size: 0.7rem; padding: 3px 8px;">AI Pick</span>
+            </div>
+            <a href="{% url 'product_detail' rproduct.id %}" style="text-decoration: none; display: block; margin-bottom: 12px;">
+                <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem; margin-bottom: 4px; line-height: 1.4;">{{ rproduct.title }}</div>
+                <div style="color: var(--text-muted); font-size: 0.82rem;">{{ rproduct.author }}</div>
+            </a>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; color: var(--green-700); font-size: 1.1rem;">${{ rproduct.effective_price|default:rproduct.price }}</span>
+                <form method="POST" action="{% url 'add_to_cart' rproduct.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn" style="background: var(--green-100); color: var(--green-700); border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                        Thêm
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

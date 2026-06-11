@@ -1,0 +1,52 @@
+{
+  "domain": "fashion",
+  "source": "hm",
+  "version": "20260609054620",
+  "artifact": "fashion-20260609054620.pt",
+  "best_model": "BiLSTM",
+  "validation": {
+    "SimpleRNN": {
+      "recall@5": 0.183671,
+      "recall@10": 0.209177,
+      "mrr@10": 0.145014,
+      "ndcg@10": 0.160401,
+      "action_accuracy": 0.999872,
+      "action_macro_f1": 0.166656
+    },
+    "LSTM": {
+      "recall@5": 0.16688,
+      "recall@10": 0.198539,
+      "mrr@10": 0.126719,
+      "ndcg@10": 0.143782,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    },
+    "BiLSTM": {
+      "recall@5": 0.213407,
+      "recall@10": 0.240323,
+      "mrr@10": 0.167717,
+      "ndcg@10": 0.185234,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    }
+  },
+  "test": {
+    "recall@5": 0.175319,
+    "recall@10": 0.199281,
+    "mrr@10": 0.130632,
+    "ndcg@10": 0.147174,
+    "action_accuracy": 1.0,
+    "action_macro_f1": 0.166667
+  },
+  "popularity_baseline": {
+    "recall@5": 0.007562,
+    "recall@10": 0.012176,
+    "mrr@10": 0.0034,
+    "ndcg@10": 0.005435
+  },
+  "sample_counts": {
+    "train": 33224,
+    "validation": 7802,
+    "test": 10016
+  }
+}

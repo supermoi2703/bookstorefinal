@@ -1,0 +1,52 @@
+{
+  "domain": "book",
+  "source": "goodreads",
+  "version": "20260609054434",
+  "artifact": "book-20260609054434.pt",
+  "best_model": "BiLSTM",
+  "validation": {
+    "SimpleRNN": {
+      "recall@5": 0.027359,
+      "recall@10": 0.033854,
+      "mrr@10": 0.022631,
+      "ndcg@10": 0.025232,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    },
+    "LSTM": {
+      "recall@5": 0.035788,
+      "recall@10": 0.045875,
+      "mrr@10": 0.026582,
+      "ndcg@10": 0.031095,
+      "action_accuracy": 0.999862,
+      "action_macro_f1": 0.166655
+    },
+    "BiLSTM": {
+      "recall@5": 0.04021,
+      "recall@10": 0.047257,
+      "mrr@10": 0.031725,
+      "ndcg@10": 0.035406,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    }
+  },
+  "test": {
+    "recall@5": 0.031119,
+    "recall@10": 0.039073,
+    "mrr@10": 0.026146,
+    "ndcg@10": 0.029168,
+    "action_accuracy": 1.0,
+    "action_macro_f1": 0.166667
+  },
+  "popularity_baseline": {
+    "recall@5": 0.006909,
+    "recall@10": 0.012574,
+    "mrr@10": 0.003964,
+    "ndcg@10": 0.005926
+  },
+  "sample_counts": {
+    "train": 33727,
+    "validation": 7237,
+    "test": 7166
+  }
+}

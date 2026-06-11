@@ -1,0 +1,28 @@
+{
+  "datasets": [
+    {
+      "adapter": "goodreads",
+      "interactions": "/data/raw/goodreads/interactions.json.gz",
+      "metadata": "/data/raw/goodreads/books.json.gz",
+      "max_interactions": 100000,
+      "max_products": 5000,
+      "min_interactions": 5
+    },
+    {
+      "adapter": "amazon_electronics",
+      "interactions": "/data/raw/amazon/Electronics.jsonl.gz",
+      "metadata": "/data/raw/amazon/meta_Electronics.jsonl.gz",
+      "max_interactions": 100000,
+      "max_products": 5000,
+      "min_interactions": 5
+    },
+    {
+      "adapter": "hm",
+      "interactions": "/data/raw/hm/transactions_train.csv",
+      "metadata": "/data/raw/hm/articles.csv",
+      "max_interactions": 100000,
+      "max_products": 5000,
+      "min_interactions": 5
+    }
+  ]
+}

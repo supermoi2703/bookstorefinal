@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Hồ sơ — E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h1 class="section-title">👤 Hồ sơ <span class="highlight">cá nhân</span></h1>
+        <p class="section-subtitle">Quản lý thông tin tài khoản của bạn</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">{{ success }}</div>
+{% endif %}
+
+<div class="grid-2">
+    <!-- Profile Form -->
+    <div class="card">
+        <h3 style="font-weight: 700; color: var(--text-dark); margin-bottom: 20px; font-size: 1.1rem;">📝 Thông tin cá nhân</h3>
+        <form method="POST" action="{% url 'profile_page' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" value="{{ profile.email|default:'' }}" disabled style="background: #f1f5f9;">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Họ và tên</label>
+                <input type="text" name="name" class="form-input" value="{{ profile.name|default:'' }}" placeholder="Nhập họ và tên">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số điện thoại</label>
+                <input type="tel" name="phone" class="form-input" value="{{ profile.phone|default:'' }}" placeholder="0123 456 789">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Địa chỉ</label>
+                <textarea name="address" class="form-input" placeholder="Nhập địa chỉ...">{{ profile.address|default:'' }}</textarea>
+            </div>
+            <div class="grid-2" style="gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" name="date_of_birth" class="form-input" value="{{ profile.date_of_birth|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Giới tính</label>
+                    <select name="gender" class="form-input">
+                        <option value="">-- Chọn --</option>
+                        <option value="male" {% if profile.gender == 'male' %}selected{% endif %}>Nam</option>
+                        <option value="female" {% if profile.gender == 'female' %}selected{% endif %}>Nữ</option>
+                        <option value="other" {% if profile.gender == 'other' %}selected{% endif %}>Khác</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">💾 Lưu thay đổi</button>
+        </form>
+    </div>
+
+    <!-- Account Info -->
+    <div>
+        <div class="card mb-2">
+            <h3 style="font-weight: 700; color: var(--text-dark); margin-bottom: 16px; font-size: 1.1rem;">📊 Tài khoản</h3>
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                <div style="width: 64px; height: 64px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: white;">
+                    {{ email|first|upper }}
+                </div>
+                <div>
+                    <div style="font-weight: 700; color: var(--text-dark); font-size: 1.1rem;">{{ profile.name|default:email }}</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">{{ email }}</div>
+                    {% if profile.phone %}
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">📞 {{ profile.phone }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--border-light); padding-top: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Ngày tham gia</span>
+                    <span style="color: var(--text-dark); font-size: 0.85rem; font-weight: 600;">{{ profile.created_at|default:'N/A' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-weight: 700; color: var(--text-dark); margin-bottom: 16px; font-size: 1.1rem;">⚡ Liên kết nhanh</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="{% url 'order_history' %}" class="btn btn-secondary" style="justify-content: flex-start;">📋 Lịch sử đơn hàng</a>
+                <a href="{% url 'wishlist_page' %}" class="btn btn-secondary" style="justify-content: flex-start;">❤️ Sách yêu thích</a>
+                <a href="{% url 'my_cart' %}" class="btn btn-secondary" style="justify-content: flex-start;">🛒 Giỏ hàng</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Đặt hàng thành công{% endblock %}
+{% block extra_head %}
+<style>
+    .sw {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 250px);
+        padding: 20px;
+    }
+
+    .sc {
+        max-width: 520px;
+        width: 100%;
+        text-align: center;
+        padding: 48px 36px;
+        border: 1px solid var(--green-200);
+        background: linear-gradient(180deg, var(--green-50), #fff);
+    }
+
+    .si {
+        width: 80px;
+        height: 80px;
+        background: var(--accent-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 20px;
+        box-shadow: var(--shadow-green);
+    }
+
+    .st {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+    }
+
+    .sd {
+        color: var(--text-body);
+        font-size: .95rem;
+        margin-bottom: 28px;
+    }
+
+    .od {
+        text-align: left;
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 24px;
+    }
+
+    .r {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: .88rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .r:last-child {
+        border-bottom: none;
+    }
+
+    .l {
+        color: var(--text-muted);
+    }
+
+    .v {
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: right;
+    }
+
+    .vg {
+        font-weight: 600;
+        color: var(--green-600);
+        text-align: right;
+    }
+
+    .sa {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="sw">
+    <div class="card sc">
+        <div class="si">✓</div>
+        <h1 class="st">Đặt hàng thành công! 🎉</h1>
+        <p class="sd">Cảm ơn bạn đã đặt hàng.</p>
+        {% if order %}
+        <div class="od">
+            <div class="r">
+                <span class="l">Mã đơn hàng</span>
+                <span class="v">#{{ order.id }}</span>
+            </div>
+            <div class="r">
+                <span class="l">Trạng thái</span>
+                <span class="vg">{{ order_status_display }}</span>
+            </div>
+            <div class="r">
+                <span class="l">Thanh toán</span>
+                <span class="v">{{ payment_display }}</span>
+            </div>
+            <div class="r">
+                <span class="l">Giao hàng</span>
+                <span class="v">{{ shipping_display }}</span>
+            </div>
+            {% if address %}
+            <div class="r">
+                <span class="l">Địa chỉ</span>
+                <span class="v">{{ address }}</span>
+            </div>
+            {% endif %}
+            {% if phone %}
+            <div class="r">
+                <span class="l">Điện thoại</span>
+                <span class="v">{{ phone }}</span>
+            </div>
+            {% endif %}
+            <div class="r">
+                <span class="l">Tổng tiền</span>
+                <span class="vg">${{ order_total }}</span>
+            </div>
+        </div>
+        {% endif %}
+        <div class="sa">
+            <a href="{% url 'order_history' %}" class="btn btn-primary btn-lg">📋 Xem đơn hàng</a>
+            <a href="{% url 'product_list' %}" class="btn btn-outline btn-lg">📖 Tiếp tục mua sắm</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Danh sách sách — E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h1 class="section-title">📖 Danh sách <span class="highlight">sách</span></h1>
+        <p class="section-subtitle">
+            {% if current_q %}Kết quả tìm kiếm cho "{{ current_q }}"{% else %}Khám phá bộ sưu tập sách của chúng tôi{% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card mb-3" style="padding: 16px 20px;">
+    <form method="GET" action="{% url 'product_list' %}" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+        <div style="flex: 1; min-width: 180px;">
+            <label class="form-label">Tìm kiếm</label>
+            <input type="text" name="q" class="form-input" placeholder="Tên sách, tác giả..." value="{{ current_q }}" style="padding: 9px 14px;">
+        </div>
+        <div style="min-width: 160px;">
+            <label class="form-label">Danh mục</label>
+            <select name="category" class="form-input" style="padding: 9px 14px;">
+                <option value="">Tất cả</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:"d" %}selected{% endif %}>
+                    {{ cat.icon }} {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="min-width: 120px;">
+            <label class="form-label">Giá từ</label>
+            <input type="number" name="min_price" class="form-input" placeholder="$0" value="{{ current_min_price }}" step="0.01" style="padding: 9px 14px;">
+        </div>
+        <div style="min-width: 120px;">
+            <label class="form-label">Giá đến</label>
+            <input type="number" name="max_price" class="form-input" placeholder="$999" value="{{ current_max_price }}" step="0.01" style="padding: 9px 14px;">
+        </div>
+        <div style="min-width: 150px;">
+            <label class="form-label">Sắp xếp</label>
+            <select name="sort" class="form-input" style="padding: 9px 14px;">
+                <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Mới nhất</option>
+                <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Giá thấp → cao</option>
+                <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Giá cao → thấp</option>
+                <option value="title" {% if current_sort == 'title' %}selected{% endif %}>A → Z</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm" style="height: 40px;">🔍 Lọc</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary btn-sm" style="height: 40px;">↺ Xóa lọc</a>
+    </form>
+</div>
+
+<!-- AI Graph Recommendations -->
+{% if graph_recommendations %}
+<div class="card mb-3" style="padding: 24px; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #d1fae5 100%); border: 1.5px solid var(--green-300);">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span style="font-size: 1.5rem;">🤖</span>
+        <div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--green-800); margin: 0;">Gợi ý cho bạn</h3>
+            <p style="font-size: 0.78rem; color: var(--green-600); margin: 0;">Dựa trên phân tích hành vi từ Knowledge Base Graph (AI)</p>
+        </div>
+        <span class="badge" style="background: var(--green-600); color: #fff; margin-left: auto; padding: 4px 12px; font-size: 0.7rem;">KB_Graph</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+        {% for product in graph_recommendations %}
+        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; background: rgba(255,255,255,0.85); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; transition: var(--transition); backdrop-filter: blur(4px);"
+           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)'"
+           onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+            <div style="text-align: center; padding: 16px 0; background: var(--green-50); border-radius: 8px; margin-bottom: 10px; font-size: 2rem; position: relative;">
+                📖
+                <span class="badge" style="position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #22c55e, #059669); color: #fff; font-size: 0.62rem; padding: 2px 8px;">AI Pick</span>
+            </div>
+            <div style="font-weight: 700; color: var(--text-dark); font-size: 0.85rem; line-height: 1.4; flex-grow: 1;">{{ product.title }}</div>
+            <div style="color: var(--text-muted); font-size: 0.78rem; margin: 4px 0 8px;">{{ product.author }}</div>
+            <div class="flex items-center justify-between">
+                <span class="price" style="font-size: 0.95rem;">${{ product.effective_price|default:product.price }}</span>
+                {% if product.recommendation_score %}
+                <span style="color: var(--green-600); font-size: 0.7rem; font-weight: 600;">⭐ Score: {{ product.recommendation_score }}</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Product Grid -->
+{% if products %}
+<div class="grid-4">
+    {% for product in products %}
+    <a href="{% url 'product_detail' product.id %}" class="card" style="text-decoration: none; padding: 20px; display: flex; flex-direction: column;">
+        <div style="text-align: center; padding: 24px 0; background: var(--green-50); border-radius: var(--radius-md); margin-bottom: 14px; font-size: 2.5rem; position: relative;">
+            📖
+            {% if product.is_featured %}
+            <span class="badge badge-featured" style="position: absolute; top: 8px; right: 8px;">⭐ Nổi bật</span>
+            {% endif %}
+            {% if product.discount_percent %}
+            <span class="badge badge-sale" style="position: absolute; top: 8px; left: 8px;">-{{ product.discount_percent }}%</span>
+            {% endif %}
+        </div>
+
+        <div style="font-weight: 700; color: var(--text-dark); font-size: 0.92rem; margin-bottom: 4px; line-height: 1.4; flex-grow: 1;">
+            {{ product.title }}
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 8px;">{{ product.author }}</div>
+
+        {% if product.category_name %}
+        <span class="badge badge-category mb-1" style="align-self: flex-start;">{{ product.category_name }}</span>
+        {% endif %}
+
+        <div class="flex items-center justify-between" style="margin-top: 10px;">
+            <div class="flex items-center gap-1">
+                <span class="price">${{ product.effective_price }}</span>
+                {% if product.discount_price and product.discount_percent %}
+                <span class="price-old">${{ product.price }}</span>
+                {% endif %}
+            </div>
+            {% if product.stock > 0 %}
+            <span style="color: var(--success); font-size: 0.75rem; font-weight: 600;">Còn hàng</span>
+            {% else %}
+            <span style="color: var(--danger); font-size: 0.75rem; font-weight: 600;">Hết hàng</span>
+            {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card text-center" style="padding: 60px 20px;">
+    <div style="font-size: 3rem; margin-bottom: 16px;">📭</div>
+    <h3 style="color: var(--text-dark); margin-bottom: 8px;">Không tìm thấy sách nào</h3>
+    <p style="color: var(--text-muted);">Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-outline mt-2">Xem tất cả sách</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Đăng ký - ProductStore{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 200px);
+        padding: 20px;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+        padding: 36px;
+        border: 1px solid var(--green-200);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .auth-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--accent-gradient);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin: 0 auto 16px;
+        box-shadow: var(--shadow-green);
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+    }
+
+    .auth-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .auth-form .form-input {
+        padding: 13px 16px;
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 13px;
+        font-size: 1rem;
+        margin-top: 6px;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 20px;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+    }
+
+    .auth-footer a {
+        color: var(--green-600);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">📝</div>
+            <h2 class="auth-title">Đăng ký tài khoản</h2>
+            <p class="auth-subtitle">Tạo tài khoản để bắt đầu mua sắm</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name" class="form-label">Họ và tên</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Nguyễn Văn A" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-btn">Tạo tài khoản →</button>
+        </form>
+
+        <div class="auth-footer">
+            Đã có tài khoản? <a href="{% url 'login_page' %}">Đăng nhập ngay</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

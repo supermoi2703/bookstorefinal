@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh toán - ProductStore{% endblock %}
+
+{% block extra_head %}
+<style>
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .checkout-section {
+        padding: 28px;
+        margin-bottom: 16px;
+    }
+
+    .checkout-section-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .order-item-name {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.92rem;
+    }
+
+    .order-item-qty {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+    }
+
+    .order-item-price {
+        font-weight: 700;
+        color: var(--green-600);
+        white-space: nowrap;
+    }
+
+    /* Shipping info form */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .info-grid .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .info-grid .form-input {
+        padding: 12px 14px;
+    }
+
+    /* Radio options */
+    .option-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .option-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1.5px solid var(--border-light);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .option-card:hover {
+        border-color: var(--green-300);
+        background: var(--green-50);
+    }
+
+    .option-card input[type="radio"] {
+        accent-color: var(--green-500);
+        width: 18px;
+        height: 18px;
+    }
+
+    .option-card:has(input:checked) {
+        border-color: var(--green-400);
+        background: var(--green-50);
+    }
+
+    .option-info {
+        flex: 1;
+    }
+
+    .option-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .option-desc {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    /* Summary sidebar */
+    .summary-card {
+        position: sticky;
+        top: 88px;
+        padding: 28px;
+        border: 1px solid var(--green-200);
+        background: linear-gradient(180deg, var(--green-50), #fff);
+    }
+
+    .summary-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        color: var(--text-body);
+    }
+
+    .summary-row.total {
+        border-top: 2px solid var(--green-200);
+        margin-top: 12px;
+        padding-top: 14px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: var(--text-dark);
+    }
+
+    .summary-row.total .total-price {
+        color: var(--green-600);
+    }
+
+    .place-order-btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 1.05rem;
+        margin-top: 20px;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 14px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        color: var(--green-600);
+    }
+
+    @media (max-width: 800px) {
+        .checkout-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            position: static;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h1 class="section-title">💳 Thanh <span class="highlight">toán</span></h1>
+    <p class="section-subtitle">Xác nhận đơn hàng và điền thông tin giao hàng</p>
+</div>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="{% url 'place_order' %}">
+    {% csrf_token %}
+    <div class="checkout-layout">
+        <div>
+            <!-- Order Items -->
+            <div class="card checkout-section">
+                <div class="checkout-section-title">📦 Sản phẩm đặt mua</div>
+                {% for item in items %}
+                <div class="order-item">
+                    <div>
+                        <div class="order-item-name">{{ item.product_title }}</div>
+                        <div class="order-item-qty">Số lượng: {{ item.quantity }} × ${{ item.product_price }}</div>
+                    </div>
+                    <div class="order-item-price">${{ item.subtotal|floatformat:2 }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Shipping Info -->
+            <div class="card checkout-section">
+                <div class="checkout-section-title">📍 Thông tin giao hàng</div>
+                <div class="info-grid">
+                    <div class="form-group full-width">
+                        <label for="address" class="form-label">Địa chỉ giao hàng *</label>
+                        <input type="text" id="address" name="address" class="form-input"
+                            placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Số điện thoại *</label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="0912 345 678"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="note" class="form-label">Ghi chú</label>
+                        <input type="text" id="note" name="note" class="form-input"
+                            placeholder="Ghi chú cho shipper (tùy chọn)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="card checkout-section">
+                <div class="checkout-section-title">💰 Phương thức thanh toán</div>
+                <div class="option-group">
+                    <label class="option-card">
+                        <input type="radio" name="payment_method" value="cod" checked>
+                        <div class="option-info">
+                            <div class="option-name">💵 Thanh toán khi nhận hàng (COD)</div>
+                            <div class="option-desc">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                        </div>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="payment_method" value="bank_transfer">
+                        <div class="option-info">
+                            <div class="option-name">🏦 Chuyển khoản ngân hàng</div>
+                            <div class="option-desc">Chuyển khoản qua tài khoản ngân hàng</div>
+                        </div>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="payment_method" value="credit_card">
+                        <div class="option-info">
+                            <div class="option-name">💳 Thẻ tín dụng / Ghi nợ</div>
+                            <div class="option-desc">Visa, Mastercard, JCB</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Shipping Method -->
+            <div class="card checkout-section">
+                <div class="checkout-section-title">🚚 Phương thức giao hàng</div>
+                <div class="option-group">
+                    <label class="option-card">
+                        <input type="radio" name="shipping_method" value="standard" checked>
+                        <div class="option-info">
+                            <div class="option-name">📦 Giao hàng tiêu chuẩn</div>
+                            <div class="option-desc">3-5 ngày làm việc — Miễn phí</div>
+                        </div>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="shipping_method" value="express">
+                        <div class="option-info">
+                            <div class="option-name">⚡ Giao hàng nhanh</div>
+                            <div class="option-desc">1-2 ngày làm việc</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Sidebar -->
+        <div class="card summary-card">
+            <div class="summary-title">📋 Tóm tắt đơn hàng</div>
+            <div class="summary-row">
+                <span>Số sản phẩm</span>
+                <span>{{ items|length }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tạm tính</span>
+                <span>${{ total|floatformat:2 }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Phí vận chuyển</span>
+                <span style="color: var(--green-600);">Miễn phí</span>
+            </div>
+            <div class="summary-row total">
+                <span>Tổng cộng</span>
+                <span class="total-price">${{ total|floatformat:2 }}</span>
+            </div>
+            <button type="submit" class="btn btn-primary place-order-btn">
+                🛍️ Đặt hàng
+            </button>
+            <a href="{% url 'my_cart' %}" class="back-link">← Quay lại giỏ hàng</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

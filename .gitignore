@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/static
+
+# AI datasets and generated artifacts
+ai-service/data/raw/
+ai-service/data/processed/
+ai-service/rag/artifacts/
+ai-service/model_behavior/artifacts/*.pt
+ai-service/model_behavior/artifacts/registry.json
+.test-deps/
+.codex-docker-config/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,353 @@
+services:
+  customer-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: customer_db
+      MYSQL_USER: customer_user
+      MYSQL_PASSWORD: customer_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - customer_db_data:/var/lib/mysql
+    networks:
+      - productstore-network
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "33061:3306"
+
+  customer-service:
+    build: ./customer-service
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_NAME=customer_db
+      - DB_USER=customer_user
+      - DB_PASSWORD=customer_pass
+      - DB_HOST=customer-db
+      - DB_PORT=3306
+      - CART_SERVICE_URL=http://cart-service:8000
+    depends_on:
+      - customer-db
+      - cart-service
+    networks:
+      - productstore-network
+
+  product-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: product_db
+      MYSQL_USER: product_user
+      MYSQL_PASSWORD: product_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - product_db_data:/var/lib/mysql
+    networks:
+      - productstore-network
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "33062:3306"
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "8002:8000"
+    environment:
+      - DB_NAME=product_db
+      - DB_USER=product_user
+      - DB_PASSWORD=product_pass
+      - DB_HOST=product-db
+      - DB_PORT=3306
+    depends_on:
+      - product-db
+    volumes:
+      - ./ai-service/data/processed:/data/ai-processed:ro
+    networks:
+      - productstore-network
+
+  cart-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: cart_db
+      MYSQL_USER: cart_user
+      MYSQL_PASSWORD: cart_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - cart_db_data:/var/lib/mysql
+    networks:
+      - productstore-network
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "33063:3306"
+
+  cart-service:
+    build: ./cart-service
+    ports:
+      - "8003:8000"
+    environment:
+      - DB_NAME=cart_db
+      - DB_USER=cart_user
+      - DB_PASSWORD=cart_pass
+      - DB_HOST=cart-db
+      - DB_PORT=3306
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+    depends_on:
+      - cart-db
+      - product-service
+    networks:
+      - productstore-network
+
+  order-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order_user
+      POSTGRES_PASSWORD: order_pass
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - productstore-network
+    ports:
+      - "54321:5432"
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "8004:8000"
+    environment:
+      - DB_NAME=order_db
+      - DB_USER=order_user
+      - DB_PASSWORD=order_pass
+      - DB_HOST=order-db
+      - DB_PORT=5432
+      - CART_SERVICE_URL=http://cart-service:8000
+      - PAYMENT_SERVICE_URL=http://payment-service:8000
+      - SHIPPING_SERVICE_URL=http://shipping-service:8000
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+    depends_on:
+      - order-db
+      - cart-service
+      - payment-service
+      - shipping-service
+    networks:
+      - productstore-network
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "8005:8000"
+    environment:
+      - DB_NAME=payment_db
+      - DB_USER=payment_user
+      - DB_PASSWORD=payment_pass
+      - DB_HOST=payment-db
+      - DB_PORT=5432
+    depends_on:
+      - payment-db
+    networks:
+      - productstore-network
+
+  payment-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: payment_user
+      POSTGRES_PASSWORD: payment_pass
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - productstore-network
+    ports:
+      - "54322:5432"
+
+  shipping-service:
+    build: ./shipping-service
+    ports:
+      - "8006:8000"
+    environment:
+      - DB_NAME=shipping_db
+      - DB_USER=shipping_user
+      - DB_PASSWORD=shipping_pass
+      - DB_HOST=shipping-db
+      - DB_PORT=5432
+    depends_on:
+      - shipping-db
+    networks:
+      - productstore-network
+
+  shipping-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shipping_db
+      POSTGRES_USER: shipping_user
+      POSTGRES_PASSWORD: shipping_pass
+    volumes:
+      - shipping_db_data:/var/lib/postgresql/data
+    networks:
+      - productstore-network
+    ports:
+      - "54323:5432"
+
+  rating-service:
+    build: ./rating-service
+    ports:
+      - "8007:8000"
+    environment:
+      - DB_NAME=rating_db
+      - DB_USER=rating_user
+      - DB_PASSWORD=rating_pass
+      - DB_HOST=rating-db
+      - DB_PORT=3306
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+    depends_on:
+      - rating-db
+      - product-service
+    networks:
+      - productstore-network
+
+  ai-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ai_db
+      POSTGRES_USER: ai_user
+      POSTGRES_PASSWORD: ai_pass
+    volumes:
+      - ai_db_data:/var/lib/postgresql/data
+    networks:
+      - productstore-network
+    ports:
+      - "54324:5432"
+
+  neo4j:
+    image: neo4j:5
+    environment:
+      NEO4J_AUTH: neo4j/productstore123
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - productstore-network
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "8008:8000"
+    environment:
+      - DB_NAME=ai_db
+      - DB_USER=ai_user
+      - DB_PASSWORD=ai_pass
+      - DB_HOST=ai-db
+      - DB_PORT=5432
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=productstore123
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://api.openai.com/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+    volumes:
+      - ./ai-service/data:/app/data
+      - ai_model_artifacts:/app/model_behavior/artifacts
+      - ai_rag_artifacts:/app/rag/artifacts
+    depends_on:
+      - ai-db
+      - product-service
+      - neo4j
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - productstore-network
+
+  ai-graph-worker:
+    build: ./ai-service
+    command: ["python", "scripts/graph_worker.py", "--batch-size", "200", "--interval", "2"]
+    environment:
+      - DB_NAME=ai_db
+      - DB_USER=ai_user
+      - DB_PASSWORD=ai_pass
+      - DB_HOST=ai-db
+      - DB_PORT=5432
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=productstore123
+    depends_on:
+      - ai-db
+      - neo4j
+    restart: on-failure
+    volumes:
+      - ./ai-service/data:/app/data
+    networks:
+      - productstore-network
+
+  rating-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: rating_db
+      MYSQL_USER: rating_user
+      MYSQL_PASSWORD: rating_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - rating_db_data:/var/lib/mysql
+    networks:
+      - productstore-network
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "33067:3306"
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PRODUCT_SERVICE_URL=http://product-service:8000
+      - CART_SERVICE_URL=http://cart-service:8000
+      - CUSTOMER_SERVICE_URL=http://customer-service:8000
+      - ORDER_SERVICE_URL=http://order-service:8000
+      - PAYMENT_SERVICE_URL=http://payment-service:8000
+      - SHIPPING_SERVICE_URL=http://shipping-service:8000
+      - RATING_SERVICE_URL=http://rating-service:8000
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - customer-service
+      - product-service
+      - cart-service
+      - order-service
+      - payment-service
+      - shipping-service
+      - rating-service
+      - ai-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - productstore-network
+
+volumes:
+  customer_db_data:
+  product_db_data:
+  cart_db_data:
+  order_db_data:
+  payment_db_data:
+  shipping_db_data:
+  rating_db_data:
+  ai_db_data:
+  neo4j_data:
+  ai_model_artifacts:
+  ai_rag_artifacts:
+
+networks:
+  productstore-network:
+    driver: bridge

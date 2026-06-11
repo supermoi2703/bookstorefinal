@@ -1,0 +1,52 @@
+{
+  "domain": "electronics",
+  "source": "amazon_electronics",
+  "version": "20260609054454",
+  "artifact": "electronics-20260609054454.pt",
+  "best_model": "BiLSTM",
+  "validation": {
+    "SimpleRNN": {
+      "recall@5": 0.294319,
+      "recall@10": 0.32909,
+      "mrr@10": 0.260338,
+      "ndcg@10": 0.276545,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    },
+    "LSTM": {
+      "recall@5": 0.293698,
+      "recall@10": 0.3353,
+      "mrr@10": 0.258758,
+      "ndcg@10": 0.276773,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    },
+    "BiLSTM": {
+      "recall@5": 0.306116,
+      "recall@10": 0.343682,
+      "mrr@10": 0.270914,
+      "ndcg@10": 0.288034,
+      "action_accuracy": 1.0,
+      "action_macro_f1": 0.166667
+    }
+  },
+  "test": {
+    "recall@5": 0.204425,
+    "recall@10": 0.238622,
+    "mrr@10": 0.178503,
+    "ndcg@10": 0.192488,
+    "action_accuracy": 1.0,
+    "action_macro_f1": 0.166667
+  },
+  "popularity_baseline": {
+    "recall@5": 0.184725,
+    "recall@10": 0.249922,
+    "mrr@10": 0.084059,
+    "ndcg@10": 0.12362
+  },
+  "sample_counts": {
+    "train": 9206,
+    "validation": 3221,
+    "test": 3977
+  }
+}

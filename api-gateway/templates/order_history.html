@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch sử đơn hàng - ProductStore{% endblock %}
+
+{% block extra_head %}
+<style>
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .order-card {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        background: var(--bg-body);
+        border-bottom: 1px solid var(--border-light);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .order-id {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-dark);
+    }
+
+    .order-date {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .order-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 14px;
+        border-radius: var(--radius-full);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .status-pending {
+        background: var(--warning-bg);
+        color: #b45309;
+        border: 1px solid #fde68a;
+    }
+
+    .status-confirmed,
+    .status-completed,
+    .status-paid {
+        background: var(--success-bg);
+        color: var(--green-700);
+        border: 1px solid var(--green-200);
+    }
+
+    .status-cancelled,
+    .status-failed {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid #fecaca;
+    }
+
+    .status-shipping,
+    .status-processing {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+    }
+
+    .order-body {
+        padding: 20px 24px;
+    }
+
+    .order-items-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .order-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background: var(--bg-body);
+        border-radius: var(--radius-sm);
+    }
+
+    .oitem-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .oitem-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--green-50);
+        border: 1px solid var(--green-200);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .oitem-title {
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: var(--text-dark);
+    }
+
+    .oitem-qty {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .oitem-price {
+        font-weight: 700;
+        color: var(--green-600);
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    /* Payment + Shipping + Total row */
+    .order-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .order-footer-item {
+        text-align: center;
+        padding: 12px;
+        background: var(--bg-body);
+        border-radius: var(--radius-md);
+    }
+
+    .footer-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+
+    .footer-value {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .footer-value.total {
+        color: var(--green-600);
+        font-size: 1.1rem;
+    }
+
+    .footer-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    /* Empty state */
+    .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-orders-icon {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 16px;
+        opacity: 0.8;
+    }
+
+    .empty-orders-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+    }
+
+    .empty-orders-desc {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+        .order-footer {
+            grid-template-columns: 1fr;
+        }
+
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h1 class="section-title">📋 Lịch sử <span class="highlight">đơn hàng</span></h1>
+    <p class="section-subtitle">Theo dõi trạng thái tất cả đơn hàng của bạn</p>
+</div>
+
+{% if orders %}
+<div class="orders-list">
+    {% for order in orders %}
+    <div class="card order-card">
+        <div class="order-header">
+            <div>
+                <span class="order-id">🧾 Đơn hàng #{{ order.id }}</span>
+                <span class="order-date">
+                    — {{ order.created_at|truncatechars:10 }}
+                </span>
+            </div>
+            <span class="order-status
+                        {% if order.status == 'pending' %}status-pending
+                        {% elif order.status == 'confirmed' or order.status == 'completed' %}status-confirmed
+                        {% elif order.status == 'cancelled' %}status-cancelled
+                        {% elif order.status == 'shipping' %}status-shipping
+                        {% else %}status-pending{% endif %}">
+                {% if order.status == 'pending' %}⏳ Chờ xử lý
+                {% elif order.status == 'confirmed' %}✅ Đã xác nhận
+                {% elif order.status == 'completed' %}🎉 Hoàn thành
+                {% elif order.status == 'shipping' %}🚚 Đang giao
+                {% elif order.status == 'cancelled' %}❌ Đã hủy
+                {% else %}{{ order.status }}
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="order-body">
+            <!-- Order Items -->
+            <div class="order-items-grid">
+                {% for item in order.items %}
+                <div class="order-item-row">
+                    <div class="oitem-info">
+                        <div class="oitem-icon">📕</div>
+                        <div>
+                            <div class="oitem-title">{{ item.product_title|default:"Sách" }}</div>
+                            <div class="oitem-qty">SL: {{ item.quantity }} × ${{ item.price }}</div>
+                        </div>
+                    </div>
+                    <div class="oitem-price">${{ item.price|floatformat:2 }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Footer: Payment + Shipping + Total -->
+            <div class="order-footer">
+                <div class="order-footer-item">
+                    <div class="footer-label">💰 Thanh toán</div>
+                    <div class="footer-value">
+                        {% if order.payment_method == 'cod' %}COD
+                        {% elif order.payment_method == 'bank_transfer' %}Chuyển khoản
+                        {% elif order.payment_method == 'credit_card' %}Thẻ tín dụng
+                        {% else %}{{ order.payment_method }}
+                        {% endif %}
+                    </div>
+                    {% if order.payment %}
+                    <div class="footer-sub">
+                        {% if order.payment.status == 'pending' %}⏳ Chờ thanh toán
+                        {% elif order.payment.status == 'completed' or order.payment.status == 'paid' %}✅ Đã thanh toán
+                        {% else %}{{ order.payment.status }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="order-footer-item">
+                    <div class="footer-label">🚚 Giao hàng</div>
+                    <div class="footer-value">
+                        {% if order.shipping_method == 'standard' %}Tiêu chuẩn
+                        {% elif order.shipping_method == 'express' %}Nhanh
+                        {% else %}{{ order.shipping_method }}
+                        {% endif %}
+                    </div>
+                    {% if order.shipping %}
+                    <div class="footer-sub">
+                        {% if order.shipping.status == 'pending' %}📦 Chuẩn bị
+                        {% elif order.shipping.status == 'shipping' %}🚚 Đang giao
+                        {% elif order.shipping.status == 'delivered' %}✅ Đã giao
+                        {% else %}{{ order.shipping.status }}
+                        {% endif %}
+                        {% if order.shipping.tracking_number %}
+                        <br>Mã: {{ order.shipping.tracking_number }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="order-footer-item">
+                    <div class="footer-label">💵 Tổng tiền</div>
+                    <div class="footer-value total">${{ order.total_amount }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty-orders">
+    <span class="empty-orders-icon">📋</span>
+    <div class="empty-orders-title">Chưa có đơn hàng nào</div>
+    <p class="empty-orders-desc">Bạn chưa đặt đơn hàng nào. Hãy khám phá cửa hàng!</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">📖 Mua sắm ngay</a>
+</div>
+{% endif %}
+{% endblock %}

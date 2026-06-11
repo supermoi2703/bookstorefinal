@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce Store{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --green-50: #f0fdf4;
+            --green-100: #dcfce7;
+            --green-200: #bbf7d0;
+            --green-300: #86efac;
+            --green-400: #4ade80;
+            --green-500: #22c55e;
+            --green-600: #16a34a;
+            --green-700: #15803d;
+            --green-800: #166534;
+            --green-900: #14532d;
+
+            --bg-body: #f8faf9;
+            --bg-white: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0fdf4;
+            --border-light: #e2e8f0;
+            --border-green: #bbf7d0;
+
+            --text-dark: #1e293b;
+            --text-body: #475569;
+            --text-muted: #94a3b8;
+            --text-white: #ffffff;
+
+            --accent: #22c55e;
+            --accent-dark: #16a34a;
+            --accent-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            --accent-light: #f0fdf4;
+
+            --success: #22c55e;
+            --success-bg: #f0fdf4;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --info: #3b82f6;
+            --info-bg: #eff6ff;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-green: 0 4px 14px rgba(34, 197, 94, 0.25);
+
+            --transition: all 0.25s ease;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-body);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            padding: 0 24px;
+        }
+
+        .navbar-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+            gap: 16px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--green-700);
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .navbar-brand:hover { opacity: 0.85; }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        /* Search bar in navbar */
+        .navbar-search {
+            flex: 1;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .navbar-search form {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 40px 9px 16px;
+            background: var(--bg-body);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-full);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--green-400);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+            background: var(--bg-white);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover { transform: translateY(-50%) scale(1.05); }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .nav-link {
+            color: var(--text-body);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--green-700);
+            background: var(--green-50);
+        }
+
+        .nav-link.active {
+            color: var(--green-700);
+            background: var(--green-100);
+            font-weight: 600;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-avatar:hover { transform: scale(1.08); }
+
+        .user-name {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge-staff {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            border-radius: var(--radius-full);
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: var(--shadow-green);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--green-700);
+            border: 1.5px solid var(--green-300);
+        }
+
+        .btn-outline:hover {
+            background: var(--green-50);
+            border-color: var(--green-400);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .btn-success {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: var(--shadow-green);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-danger:hover { background: #dc2626; }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-body);
+            padding: 8px 12px;
+        }
+
+        .btn-ghost:hover {
+            background: var(--green-50);
+            color: var(--green-700);
+        }
+
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: 0.82rem;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        /* ===== Container ===== */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            min-height: calc(100vh - 64px - 56px);
+        }
+
+        /* ===== Card ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--green-200);
+        }
+
+        /* ===== Alerts ===== */
+        .alert {
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-error {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        .alert-error::before { content: '⚠️'; }
+
+        .alert-success {
+            background: var(--success-bg);
+            color: var(--green-700);
+            border: 1px solid var(--green-200);
+        }
+
+        .alert-success::before { content: '✅'; }
+
+        .alert-info {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #bfdbfe;
+        }
+
+        .alert-info::before { content: 'ℹ️'; }
+
+        /* ===== Form ===== */
+        .form-group { margin-bottom: 18px; }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-white);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--green-400);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+        }
+
+        .form-input::placeholder { color: var(--text-muted); }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ===== Section Header ===== */
+        .section-header {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .section-title .highlight { color: var(--green-600); }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        form.inline { display: inline; }
+
+        /* ===== Badge ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-sale {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .badge-new {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-featured {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid #fde68a;
+        }
+
+        .badge-category {
+            background: var(--green-50);
+            color: var(--green-700);
+            border: 1px solid var(--green-200);
+        }
+
+        /* ===== Price ===== */
+        .price {
+            font-weight: 700;
+            color: var(--green-700);
+            font-size: 1.1rem;
+        }
+
+        .price-old {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+
+        /* ===== Grid ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            text-align: center;
+            padding: 18px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-light);
+            background: var(--bg-white);
+        }
+
+        .footer span { color: var(--green-500); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .navbar-inner {
+                height: auto;
+                flex-wrap: wrap;
+                padding: 12px 0;
+                gap: 8px;
+            }
+
+            .navbar-search { max-width: 100%; order: 3; }
+            .navbar-links { order: 4; width: 100%; justify-content: center; flex-wrap: wrap; }
+
+            .container { padding: 20px 16px; }
+            .section-title { font-size: 1.3rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .user-name { display: none; }
+        }
+
+        /* ===== Animations ===== */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mt-3 { margin-top: 24px; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-1 { gap: 8px; }
+        .gap-2 { gap: 16px; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{% url 'home' %}" class="navbar-brand">
+                <span class="brand-icon">🛒</span>
+                E-Store
+            </a>
+
+            {% if not is_staff %}
+            <div class="navbar-search">
+                <form action="{% url 'product_list' %}" method="GET">
+                    <input type="text" name="q" class="search-input" placeholder="Tìm kiếm sách, tác giả..."
+                        value="{{ current_q|default:'' }}">
+                    <button type="submit" class="search-btn">🔍</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <div class="navbar-links">
+                {% if is_staff %}
+                <a href="{% url 'staff_products' %}" class="nav-link">📦 Quản lý sách</a>
+                {% else %}
+                <a href="{% url 'product_list' %}" class="nav-link">📖 Sách</a>
+                {% if customer_id %}
+                <a href="{% url 'my_cart' %}" class="nav-link">🛒 Giỏ hàng</a>
+                <a href="{% url 'wishlist_page' %}" class="nav-link">❤️ Yêu thích</a>
+                <a href="{% url 'order_history' %}" class="nav-link">📋 Đơn hàng</a>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="navbar-actions">
+                {% if email %}
+                <div class="user-info">
+                    <a href="{% url 'profile_page' %}" title="Hồ sơ">
+                        <div class="user-avatar">{{ email|first|upper }}</div>
+                    </a>
+                    <span class="user-name">{{ customer_name|default:email }}</span>
+                    {% if is_staff %}
+                    <span class="badge-staff">Staff</span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'logout_view' %}" class="btn btn-secondary btn-sm">Đăng xuất</a>
+                {% else %}
+                <a href="{% url 'login_page' %}" class="btn btn-outline btn-sm">Đăng nhập</a>
+                <a href="{% url 'register_page' %}" class="btn btn-primary btn-sm">Đăng ký</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container fade-in">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        © 2026 <span>E-Commerce Store</span> — Microservices Architecture — Built with 💚
+    </footer>
+    {% if customer_id %}
+    <style>
+        /* ===== AI Chat Assistant ===== */
+        .chat-toggle {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 400;
+            width: auto;
+            min-width: 140px;
+            padding: 0 20px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4), 0 0 0 0 rgba(16, 185, 129, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: chatPulse 3s ease-in-out infinite;
+        }
+        .chat-toggle:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 28px rgba(5, 150, 105, 0.5);
+        }
+        .chat-toggle.active {
+            animation: none;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
+        }
+        @keyframes chatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4), 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4), 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+
+        .chat-panel {
+            display: none;
+            position: fixed;
+            right: 24px;
+            bottom: 92px;
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            height: 520px;
+            max-height: calc(100vh - 120px);
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            z-index: 400;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chatSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chat-panel.visible {
+            display: flex;
+        }
+        @keyframes chatSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .chat-header-avatar {
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            backdrop-filter: blur(8px);
+        }
+        .chat-header-info h4 {
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .chat-header-info p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.72rem;
+            margin: 2px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chat-header-info .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .chat-header-badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f8faf9;
+            scroll-behavior: smooth;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+        .chat-msg {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            animation: msgFadeIn 0.3s ease-out;
+        }
+        @keyframes msgFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-msg.user { align-items: flex-end; }
+        .chat-msg.bot { align-items: flex-start; }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .chat-msg.user .chat-bubble {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.bot .chat-bubble {
+            background: #fff;
+            color: var(--text-dark);
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .chat-msg .chat-time {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            margin-top: 3px;
+            padding: 0 4px;
+        }
+        .chat-msg .chat-cite {
+            font-size: 0.68rem;
+            color: #6b7280;
+            margin-top: 2px;
+            padding: 0 4px;
+            font-style: italic;
+        }
+        .chat-msg .chat-source-badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 8px;
+            margin-top: 3px;
+        }
+        .source-faq { background: #dbeafe; color: #2563eb; }
+        .source-rag_graph { background: #d1fae5; color: #059669; }
+        .source-rag_kb { background: #fef3c7; color: #d97706; }
+
+        .chat-typing {
+            display: none;
+            padding: 8px 14px;
+            margin-bottom: 8px;
+        }
+        .chat-typing.visible { display: flex; align-items: center; gap: 4px; }
+        .chat-typing span {
+            width: 6px; height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typingDot 1.4s ease-in-out infinite;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingDot {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        .chat-quick-actions {
+            padding: 8px 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #fff;
+            border-top: 1px solid #f3f4f6;
+        }
+        .chat-quick-btn {
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1.5px solid #d1fae5;
+            background: #f0fdf4;
+            color: var(--green-700);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-quick-btn:hover {
+            background: var(--green-100);
+            border-color: var(--green-400);
+            transform: translateY(-1px);
+        }
+
+        .chat-input-area {
+            padding: 12px 14px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #fff;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            background: #f9fafb;
+        }
+        .chat-input:focus {
+            border-color: var(--green-400);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            background: #fff;
+        }
+        .chat-input::placeholder { color: #9ca3af; }
+        .chat-send-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .chat-send-btn:hover { transform: scale(1.08); box-shadow: 0 2px 10px rgba(5,150,105,0.3); }
+        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        @media (max-width: 480px) {
+            .chat-panel {
+                right: 8px;
+                bottom: 80px;
+                width: calc(100vw - 16px);
+                height: calc(100vh - 100px);
+                border-radius: 16px;
+            }
+            .chat-toggle { right: 16px; bottom: 16px; }
+        }
+    </style>
+    <button id="chatToggle" class="chat-toggle" title="Trợ lý AI E-Store">
+        🤖 <span style="font-size: 1rem; font-weight: 700; margin-left: 8px;">AI Tư vấn</span>
+    </button>
+
+    <div id="chatPanel" class="chat-panel">
+        <div class="chat-header">
+            <div class="chat-header-avatar">📚</div>
+            <div class="chat-header-info">
+                <h4>E-Store AI Assistant</h4>
+                <p><span class="status-dot"></span> Powered by KB_Graph · RAG</p>
+            </div>
+            <span class="chat-header-badge">AI</span>
+        </div>
+
+        <div id="chatMessages" class="chat-messages">
+            <div class="chat-msg bot">
+                <div class="chat-bubble">
+                    Xin chào <strong>{{ customer_name|default:"bạn" }}</strong>! 👋<br>
+                    Tôi là trợ lý AI của E-Store, được hỗ trợ bởi <em>Knowledge Base Graph</em>.<br>
+                    Tôi có thể giúp bạn:
+                    <ul style="margin: 6px 0 0 16px; padding: 0; font-size: 0.82rem;">
+                        <li>🎯 Gợi ý sách phù hợp với bạn</li>
+                        <li>📦 Thông tin giao hàng & đổi trả</li>
+                        <li>💳 Hướng dẫn thanh toán</li>
+                    </ul>
+                </div>
+                <span class="chat-time">AI Assistant</span>
+            </div>
+        </div>
+
+        <div id="chatTyping" class="chat-typing">
+            <span></span><span></span><span></span>
+            <span style="font-size: 0.72rem; color: #9ca3af; margin-left: 4px;">Đang tìm kiếm...</span>
+        </div>
+
+        <div class="chat-quick-actions">
+            <button class="chat-quick-btn" data-q="Gợi ý sách phù hợp với tôi">🎯 Gợi ý cho tôi</button>
+            <button class="chat-quick-btn" data-q="Sách bán chạy nhất là gì?">🔥 Bán chạy</button>
+            <button class="chat-quick-btn" data-q="Chính sách giao hàng như thế nào?">📦 Giao hàng</button>
+            <button class="chat-quick-btn" data-q="Tôi muốn đổi trả sản phẩm">🔄 Đổi trả</button>
+            <button class="chat-quick-btn" data-q="Phương thức thanh toán nào được hỗ trợ?">💳 Thanh toán</button>
+        </div>
+
+        <div class="chat-input-area">
+            <input id="chatInput" class="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off">
+            <button id="chatSend" class="chat-send-btn" title="Gửi">➤</button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const toggle = document.getElementById('chatToggle');
+            const panel = document.getElementById('chatPanel');
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('chatSend');
+            const messages = document.getElementById('chatMessages');
+            const typing = document.getElementById('chatTyping');
+            let isOpen = false;
+            let isSending = false;
+
+            function getTime() {
+                return new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function addMessage(text, isUser, citations, source) {
+                const msg = document.createElement('div');
+                msg.className = 'chat-msg ' + (isUser ? 'user' : 'bot');
+
+                let html = '<div class="chat-bubble">' + escapeHtml(text) + '</div>';
+                html += '<span class="chat-time">' + getTime() + '</span>';
+
+                if (!isUser && citations && citations.length) {
+                    html += '<span class="chat-cite">📎 ' + citations.join(', ') + '</span>';
+                }
+                if (!isUser && source) {
+                    const sourceLabels = {
+                        'faq': ['FAQ', 'source-faq'],
+                        'rag_graph': ['KB_Graph', 'source-rag_graph'],
+                        'rag_kb': ['Knowledge Base', 'source-rag_kb'],
+                        'rag_llm': ['Vector RAG + LLM', 'source-rag_graph'],
+                        'rag_extractive': ['Vector RAG', 'source-rag_kb'],
+                    };
+                    const [label, cls] = sourceLabels[source] || [source, ''];
+                    if (cls) {
+                        html += '<span class="chat-source-badge ' + cls + '">' + label + '</span>';
+                    }
+                }
+
+                msg.innerHTML = html;
+                messages.appendChild(msg);
+                messages.scrollTop = messages.scrollHeight;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function showTyping() { typing.classList.add('visible'); messages.scrollTop = messages.scrollHeight; }
+            function hideTyping() { typing.classList.remove('visible'); }
+
+            async function sendMessage() {
+                const text = (input.value || '').trim();
+                if (!text || isSending) return;
+                isSending = true;
+                sendBtn.disabled = true;
+
+                addMessage(text, true);
+                input.value = '';
+                showTyping();
+
+                try {
+                    const resp = await fetch('/api/chat/advice/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text, customer_id: {{ customer_id|default:"null" }} })
+                    });
+                    hideTyping();
+
+                    if (resp.status === 401) {
+                        addMessage('Bạn cần đăng nhập để sử dụng trợ lý AI.', false);
+                    } else {
+                        const data = await resp.json();
+                        addMessage(
+                            data.answer || 'Hiện chưa có phản hồi phù hợp.',
+                            false,
+                            data.citations || [],
+                            data.source || ''
+                        );
+                    }
+                } catch (err) {
+                    hideTyping();
+                    addMessage('⚠️ Dịch vụ tạm thời gián đoạn. Vui lòng thử lại sau.', false);
+                }
+                isSending = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+
+            toggle.addEventListener('click', function () {
+                isOpen = !isOpen;
+                panel.classList.toggle('visible', isOpen);
+                toggle.classList.toggle('active', isOpen);
+                toggle.textContent = isOpen ? '✕' : '🤖';
+                if (isOpen) input.focus();
+            });
+
+            sendBtn.addEventListener('click', sendMessage);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            document.querySelectorAll('.chat-quick-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    input.value = this.getAttribute('data-q') || '';
+                    sendMessage();
+                });
+            });
+        })();
+    </script>
+    {% endif %}
+</body>
+
+</html>
