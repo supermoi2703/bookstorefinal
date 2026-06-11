@@ -3,19 +3,63 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div style="background: var(--accent-gradient); border-radius: var(--radius-xl); padding: 48px 40px; margin-bottom: 40px; color: white; position: relative; overflow: hidden;">
-    <div style="position: relative; z-index: 1;">
-        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 12px;">
-            Khám phá thế giới sách 📚
-        </h1>
-        <p style="font-size: 1.05rem; opacity: 0.9; margin-bottom: 24px; max-width: 500px;">
-            Hàng ngàn đầu sách hay đang chờ bạn. Từ văn học kinh điển đến công nghệ hiện đại.
-        </p>
-        <a href="{% url 'product_list' %}" class="btn" style="background: white; color: var(--green-700); font-weight: 700; padding: 12px 28px; font-size: 1rem;">
-            🛍️ Khám phá ngay
-        </a>
+<div class="hero-banner" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c084fc 100%); border-radius: var(--radius-xl); padding: 56px 48px; margin-bottom: 40px; color: white; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);">
+    <!-- Background abstract patterns -->
+    <div style="position: absolute; top: -10%; right: -5%; width: 300px; height: 300px; background: rgba(255,255,255,0.08); border-radius: 50%; filter: blur(40px);"></div>
+    <div style="position: absolute; bottom: -20%; left: 30%; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.3); border-radius: 50%; filter: blur(50px);"></div>
+    
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items: center; position: relative; z-index: 2;">
+        <div>
+            <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px); padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+                ✨ Chào mừng tới E-Store
+            </span>
+            <h1 style="font-size: 2.6rem; font-weight: 850; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.5px;">
+                Đưa tri thức tới <br><span style="background: linear-gradient(to right, #ffd700, #fca5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">mọi nhà</span> 📚
+            </h1>
+            <p style="font-size: 1.05rem; opacity: 0.95; margin-bottom: 32px; max-width: 480px; line-height: 1.6;">
+                Khám phá thế giới sách đa dạng từ Văn học, Khoa học, Công nghệ cho tới Kỹ năng sống. AI hỗ trợ tư vấn thông minh 24/7.
+            </p>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <a href="{% url 'product_list' %}" class="btn" style="background: white; color: #4f46e5; font-weight: 700; padding: 14px 32px; font-size: 0.95rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: var(--transition);"
+                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'"
+                   onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.08)'">
+                    🛍️ Mua sách ngay
+                </a>
+                {% if customer_id %}
+                <button class="btn" onclick="document.getElementById('chatToggle').click()" style="background: rgba(255, 255, 255, 0.15); color: white; font-weight: 600; padding: 14px 28px; font-size: 0.95rem; border: 1.5px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); backdrop-filter: blur(8px); transition: var(--transition);"
+                   onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none'">
+                    🤖 Trợ lý AI tư vấn
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Animated floating book representation -->
+        <div style="display: flex; justify-content: center; position: relative;">
+            <div class="hero-floating-book" style="font-size: 9rem; animation: floatAnim 4s ease-in-out infinite; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.25));">
+                📖
+            </div>
+            <!-- Smaller floating decorative shapes -->
+            <span style="position: absolute; top: 10%; left: 15%; font-size: 2.2rem; animation: floatAnim2 5s ease-in-out infinite;">✨</span>
+            <span style="position: absolute; bottom: 20%; right: 10%; font-size: 1.8rem; animation: floatAnim3 3.5s ease-in-out infinite;">💡</span>
+        </div>
     </div>
-    <div style="position: absolute; right: 40px; bottom: -10px; font-size: 8rem; opacity: 0.15;">📖</div>
+    
+    <style>
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+        @keyframes floatAnim2 {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-8px) scale(1.15); opacity: 1; }
+        }
+        @keyframes floatAnim3 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-8deg); }
+        }
+    </style>
 </div>
 
 <!-- Categories -->
@@ -24,17 +68,23 @@
     <div class="section-header">
         <div>
             <h2 class="section-title">Danh mục <span class="highlight">sản phẩm</span></h2>
-            <p class="section-subtitle">Chọn danh mục bạn quan tâm</p>
+            <p class="section-subtitle">Khám phá sách theo lĩnh vực chuyên môn</p>
         </div>
     </div>
-    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
         {% for cat in categories %}
         <a href="{% url 'product_list' %}?category={{ cat.id }}"
-           class="card" style="text-decoration: none; padding: 16px 24px; display: flex; align-items: center; gap: 12px; flex: 1; min-width: 180px;">
-            <span style="font-size: 1.8rem;">{{ cat.icon }}</span>
+           class="card" style="text-decoration: none; padding: 20px; display: flex; align-items: center; gap: 16px; border-radius: var(--radius-lg); position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-card);"
+           onmouseover="this.style.borderColor='var(--green-400)'; this.style.boxShadow='0 10px 25px rgba(99,102,241,0.06)'; this.style.transform='translateY(-3px)'"
+           onmouseout="this.style.borderColor='var(--border-light)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='none'">
+            <div style="width: 52px; height: 52px; background: rgba(139, 92, 246, 0.08); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: var(--transition);"
+                 onmouseover="this.style.background='rgba(139, 92, 246, 0.15)'"
+                 onmouseout="this.style.background='rgba(139, 92, 246, 0.08)'">
+                {{ cat.icon }}
+            </div>
             <div>
-                <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem;">{{ cat.name }}</div>
-                <div style="color: var(--text-muted); font-size: 0.78rem;">{{ cat.product_count }} sách</div>
+                <div style="font-weight: 700; color: var(--text-dark); font-size: 1rem; margin-bottom: 2px;">{{ cat.name }}</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">{{ cat.product_count }} đầu sách</div>
             </div>
         </a>
         {% endfor %}
@@ -48,58 +98,113 @@
     <div class="section-header">
         <div>
             <h2 class="section-title">Sách <span class="highlight">nổi bật</span> ⭐</h2>
-            <p class="section-subtitle">Được yêu thích nhất</p>
+            <p class="section-subtitle">Bộ sưu tập sách được tuyển chọn đặc biệt</p>
         </div>
-        <a href="{% url 'product_list' %}" class="btn btn-outline btn-sm">Xem tất cả →</a>
+        <a href="{% url 'product_list' %}" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full); padding: 8px 16px;">Xem tất cả →</a>
     </div>
     <div class="grid-4">
         {% for product in featured_products %}
-        <a href="{% url 'product_detail' product.id %}" class="card" style="text-decoration: none; padding: 20px;">
-            <div style="text-align: center; padding: 20px 0; background: var(--green-50); border-radius: var(--radius-md); margin-bottom: 16px; font-size: 3rem;">
-                📖
-            </div>
+        <div class="card" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-lg); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-card); position: relative;"
+             onmouseover="this.style.borderColor='var(--green-400)'; this.style.boxShadow='0 12px 30px rgba(99, 102, 241, 0.08)'; this.style.transform='translateY(-4px)'"
+             onmouseout="this.style.borderColor='var(--border-light)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='none'">
+            
+            <!-- Floating discount badge -->
             {% if product.discount_percent %}
-            <span class="badge badge-sale mb-1">-{{ product.discount_percent }}%</span>
+            <span class="badge badge-sale" style="position: absolute; top: 12px; left: 12px; z-index: 10; padding: 4px 10px; font-weight: 800; border-radius: 6px;">
+                -{{ product.discount_percent }}%
+            </span>
             {% endif %}
-            <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem; margin-bottom: 4px; line-height: 1.4;">
-                {{ product.title }}
+
+            <!-- Book Image Area -->
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block;">
+                <div style="text-align: center; padding: 36px 0; background: linear-gradient(135deg, #f3f4f6, #f9fafb); border-bottom: 1px solid var(--border-light); font-size: 3.5rem; transition: var(--transition); position: relative;">
+                    📖
+                </div>
+            </a>
+
+            <!-- Book Info Area -->
+            <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; margin-bottom: 8px;">
+                    {% if product.category_name %}
+                    <span class="badge badge-category" style="font-size: 0.65rem; padding: 2px 8px; border-radius: 4px;">{{ product.category_name }}</span>
+                    {% endif %}
+                    <span style="color: #f59e0b; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 2px;">
+                        ★ 4.8
+                    </span>
+                </div>
+
+                <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block; flex-grow: 1; margin-bottom: 12px;">
+                    <h3 style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                        {{ product.title }}
+                    </h3>
+                    <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">{{ product.author }}</div>
+                </a>
+
+                <!-- Buy row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 12px;">
+                    <div style="display: flex; align-items: baseline; gap: 4px;">
+                        <span class="price" style="font-size: 1.15rem; font-weight: 800;">${{ product.effective_price }}</span>
+                        {% if product.discount_price and product.discount_percent %}
+                        <span class="price-old" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: line-through;">${{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{% url 'product_detail' product.id %}" class="btn" style="padding: 7px 12px; font-size: 0.78rem; background: var(--green-50); color: var(--green-700); border-radius: 6px; font-weight: 700; border: none; transition: var(--transition);"
+                       onmouseover="this.style.background='var(--green-100)';"
+                       onmouseout="this.style.background='var(--green-50)';">
+                        Chi tiết
+                    </a>
+                </div>
             </div>
-            <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 8px;">{{ product.author }}</div>
-            {% if product.category_name %}
-            <span class="badge badge-category mb-1">{{ product.category_name }}</span>
-            {% endif %}
-            <div class="flex items-center gap-1" style="margin-top: 8px;">
-                <span class="price">${{ product.effective_price }}</span>
-                {% if product.discount_price and product.discount_percent %}
-                <span class="price-old">${{ product.price }}</span>
-                {% endif %}
-            </div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 </div>
 {% endif %}
 
+<!-- Personalized Recommendations with a glowing AI container -->
 {% if personalized_products %}
-<div class="mb-3">
-    <div class="section-header">
+<div class="mb-3" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%); border: 1.5px solid rgba(139, 92, 246, 0.12); border-radius: var(--radius-xl); padding: 32px; margin-top: 40px; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.02);">
+    <div class="section-header" style="margin-bottom: 24px;">
         <div>
-            <h2 class="section-title">Gợi ý <span class="highlight">cho bạn</span> 🤖</h2>
-            <p class="section-subtitle">Dựa trên hành vi gần đây của bạn</p>
+            <h2 class="section-title" style="display: flex; align-items: center; gap: 8px;">
+                <span>🤖 Gợi ý</span> <span class="highlight">cho bạn</span>
+            </h2>
+            <p class="section-subtitle">Dựa trên thói quen đọc sách & hành vi duyệt web của riêng bạn (Phân tích AI)</p>
         </div>
+        <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; padding: 4px 12px; font-size: 0.7rem;">Personalized RAG</span>
     </div>
     <div class="grid-4">
         {% for product in personalized_products %}
-        <a href="{% url 'product_detail' product.id %}" class="card" style="text-decoration: none; padding: 20px;">
-            <div style="text-align: center; padding: 20px 0; background: var(--green-50); border-radius: var(--radius-md); margin-bottom: 16px; font-size: 2.8rem;">
-                📘
+        <div class="card" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-lg); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: #fff; position: relative;"
+             onmouseover="this.style.borderColor='var(--green-400)'; this.style.boxShadow='0 12px 30px rgba(139, 92, 246, 0.08)'; this.style.transform='translateY(-4px)'"
+             onmouseout="this.style.borderColor='var(--border-light)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='none'">
+            
+            <!-- Book Image Area -->
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block;">
+                <div style="text-align: center; padding: 32px 0; background: linear-gradient(135deg, #f5f3ff, #faf5ff); border-bottom: 1px solid var(--border-light); font-size: 3.2rem; position: relative;">
+                    📘
+                    <span class="badge" style="position: absolute; top: 10px; right: 10px; background: rgba(139,92,246,0.15); color: #7c3aed; font-size: 0.62rem; padding: 2px 8px; font-weight: 700;">AI Pick</span>
+                </div>
+            </a>
+
+            <!-- Book Info Area -->
+            <div style="padding: 16px; display: flex; flex-direction: column; flex-grow: 1;">
+                <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block; flex-grow: 1; margin-bottom: 10px;">
+                    <h3 style="font-weight: 700; color: var(--text-dark); font-size: 0.9rem; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                        {{ product.title }}
+                    </h3>
+                    <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">{{ product.author }}</div>
+                </a>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 10px;">
+                    <span class="price" style="font-size: 1.05rem; font-weight: 800;">${{ product.effective_price|default:product.price }}</span>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; font-weight: 700; text-decoration: none;">
+                        Mua ngay
+                    </a>
+                </div>
             </div>
-            <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem; margin-bottom: 4px; line-height: 1.4;">
-                {{ product.title }}
-            </div>
-            <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 8px;">{{ product.author }}</div>
-            <div class="price">${{ product.effective_price|default:product.price }}</div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 </div>
@@ -107,26 +212,34 @@
 
 <!-- Quick stats for logged-in users -->
 {% if customer_id %}
-<div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 32px;">
-    <a href="{% url 'my_cart' %}" class="card" style="text-decoration: none; flex: 1; min-width: 200px; padding: 20px; text-align: center;">
-        <div style="font-size: 2rem; margin-bottom: 8px;">🛒</div>
-        <div style="font-weight: 700; color: var(--text-dark);">Giỏ hàng</div>
-        <div style="color: var(--text-muted); font-size: 0.82rem;">Xem giỏ hàng của bạn</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 40px;">
+    <a href="{% url 'my_cart' %}" class="card" style="text-decoration: none; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; border-radius: var(--radius-xl); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
+       onmouseover="this.style.borderColor='var(--green-400)'; this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.borderColor='var(--border-light)'; this.style.transform='none'">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; width: 64px; height: 64px; background: rgba(99,102,241,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center;">🛒</div>
+        <div style="font-weight: 700; color: var(--text-dark); font-size: 1.05rem; margin-bottom: 4px;">Giỏ hàng</div>
+        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">Quản lý & thanh toán nhanh</div>
     </a>
-    <a href="{% url 'order_history' %}" class="card" style="text-decoration: none; flex: 1; min-width: 200px; padding: 20px; text-align: center;">
-        <div style="font-size: 2rem; margin-bottom: 8px;">📋</div>
-        <div style="font-weight: 700; color: var(--text-dark);">Đơn hàng</div>
-        <div style="color: var(--text-muted); font-size: 0.82rem;">Theo dõi đơn hàng</div>
+    <a href="{% url 'order_history' %}" class="card" style="text-decoration: none; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; border-radius: var(--radius-xl); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
+       onmouseover="this.style.borderColor='var(--green-400)'; this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.borderColor='var(--border-light)'; this.style.transform='none'">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; width: 64px; height: 64px; background: rgba(139,92,246,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center;">📋</div>
+        <div style="font-weight: 700; color: var(--text-dark); font-size: 1.05rem; margin-bottom: 4px;">Đơn hàng</div>
+        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">Theo dõi trạng thái giao hàng</div>
     </a>
-    <a href="{% url 'wishlist_page' %}" class="card" style="text-decoration: none; flex: 1; min-width: 200px; padding: 20px; text-align: center;">
-        <div style="font-size: 2rem; margin-bottom: 8px;">❤️</div>
-        <div style="font-weight: 700; color: var(--text-dark);">Yêu thích</div>
-        <div style="color: var(--text-muted); font-size: 0.82rem;">Sách bạn đã lưu</div>
+    <a href="{% url 'wishlist_page' %}" class="card" style="text-decoration: none; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; border-radius: var(--radius-xl); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
+       onmouseover="this.style.borderColor='var(--green-400)'; this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.borderColor='var(--border-light)'; this.style.transform='none'">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; width: 64px; height: 64px; background: rgba(239,68,68,0.06); border-radius: 50%; display: flex; align-items: center; justify-content: center;">❤️</div>
+        <div style="font-weight: 700; color: var(--text-dark); font-size: 1.05rem; margin-bottom: 4px;">Yêu thích</div>
+        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">Bộ sưu tập sách đã lưu</div>
     </a>
-    <a href="{% url 'profile_page' %}" class="card" style="text-decoration: none; flex: 1; min-width: 200px; padding: 20px; text-align: center;">
-        <div style="font-size: 2rem; margin-bottom: 8px;">👤</div>
-        <div style="font-weight: 700; color: var(--text-dark);">Hồ sơ</div>
-        <div style="color: var(--text-muted); font-size: 0.82rem;">Cập nhật thông tin</div>
+    <a href="{% url 'profile_page' %}" class="card" style="text-decoration: none; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; border-radius: var(--radius-xl); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
+       onmouseover="this.style.borderColor='var(--green-400)'; this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.borderColor='var(--border-light)'; this.style.transform='none'">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; width: 64px; height: 64px; background: rgba(16,185,129,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center;">👤</div>
+        <div style="font-weight: 700; color: var(--text-dark); font-size: 1.05rem; margin-bottom: 4px;">Hồ sơ</div>
+        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">Cập nhật thông tin cá nhân</div>
     </a>
 </div>
 {% endif %}

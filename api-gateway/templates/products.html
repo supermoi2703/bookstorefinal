@@ -6,22 +6,22 @@
     <div>
         <h1 class="section-title">📖 Danh sách <span class="highlight">sách</span></h1>
         <p class="section-subtitle">
-            {% if current_q %}Kết quả tìm kiếm cho "{{ current_q }}"{% else %}Khám phá bộ sưu tập sách của chúng tôi{% endif %}
+            {% if current_q %}Kết quả tìm kiếm cho "{{ current_q }}"{% else %}Khám phá bộ sưu tập sách chất lượng cao của chúng tôi{% endif %}
         </p>
     </div>
 </div>
 
 <!-- Filter Bar -->
-<div class="card mb-3" style="padding: 16px 20px;">
-    <form method="GET" action="{% url 'product_list' %}" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
-        <div style="flex: 1; min-width: 180px;">
-            <label class="form-label">Tìm kiếm</label>
-            <input type="text" name="q" class="form-input" placeholder="Tên sách, tác giả..." value="{{ current_q }}" style="padding: 9px 14px;">
+<div class="card mb-3" style="padding: 24px; border-radius: var(--radius-xl); background: var(--bg-card); box-shadow: var(--shadow-sm);">
+    <form method="GET" action="{% url 'product_list' %}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; align-items: flex-end;">
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔍 Tìm kiếm</label>
+            <input type="text" name="q" class="form-input" placeholder="Tên sách, tác giả..." value="{{ current_q }}" style="padding: 10px 14px; border-radius: 8px;">
         </div>
-        <div style="min-width: 160px;">
-            <label class="form-label">Danh mục</label>
-            <select name="category" class="form-input" style="padding: 9px 14px;">
-                <option value="">Tất cả</option>
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📁 Danh mục</label>
+            <select name="category" class="form-input" style="padding: 10px 14px; border-radius: 8px;">
+                <option value="">Tất cả danh mục</option>
                 {% for cat in categories %}
                 <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:"d" %}selected{% endif %}>
                     {{ cat.icon }} {{ cat.name }}
@@ -29,57 +29,68 @@
                 {% endfor %}
             </select>
         </div>
-        <div style="min-width: 120px;">
-            <label class="form-label">Giá từ</label>
-            <input type="number" name="min_price" class="form-input" placeholder="$0" value="{{ current_min_price }}" step="0.01" style="padding: 9px 14px;">
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">💵 Giá tối thiểu</label>
+            <input type="number" name="min_price" class="form-input" placeholder="$0" value="{{ current_min_price }}" step="0.01" style="padding: 10px 14px; border-radius: 8px;">
         </div>
-        <div style="min-width: 120px;">
-            <label class="form-label">Giá đến</label>
-            <input type="number" name="max_price" class="form-input" placeholder="$999" value="{{ current_max_price }}" step="0.01" style="padding: 9px 14px;">
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">💵 Giá tối đa</label>
+            <input type="number" name="max_price" class="form-input" placeholder="$999" value="{{ current_max_price }}" step="0.01" style="padding: 10px 14px; border-radius: 8px;">
         </div>
-        <div style="min-width: 150px;">
-            <label class="form-label">Sắp xếp</label>
-            <select name="sort" class="form-input" style="padding: 9px 14px;">
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⇅ Sắp xếp</label>
+            <select name="sort" class="form-input" style="padding: 10px 14px; border-radius: 8px;">
                 <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Mới nhất</option>
                 <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Giá thấp → cao</option>
                 <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Giá cao → thấp</option>
                 <option value="title" {% if current_sort == 'title' %}selected{% endif %}>A → Z</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm" style="height: 40px;">🔍 Lọc</button>
-        <a href="{% url 'product_list' %}" class="btn btn-secondary btn-sm" style="height: 40px;">↺ Xóa lọc</a>
+        <div style="display: flex; gap: 8px; grid-column: span 1;">
+            <button type="submit" class="btn btn-primary" style="height: 42px; border-radius: 8px; flex: 2; font-weight: 700;">🔍 Lọc</button>
+            <a href="{% url 'product_list' %}" class="btn btn-outline" style="height: 42px; border-radius: 8px; flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 600;" title="Xóa lọc">↺</a>
+        </div>
     </form>
 </div>
 
 <!-- AI Graph Recommendations -->
 {% if graph_recommendations %}
-<div class="card mb-3" style="padding: 24px; background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 50%, #e0e7ff 100%); border: 1.5px solid var(--green-300);">
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-        <span style="font-size: 1.5rem;">🤖</span>
+<div class="card mb-3" style="padding: 32px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%); border: 1.5px solid rgba(139, 92, 246, 0.15); border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.02);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="font-size: 1.8rem; background: rgba(139, 92, 246, 0.1); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">🤖</span>
         <div>
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--green-800); margin: 0;">Gợi ý cho bạn</h3>
-            <p style="font-size: 0.78rem; color: var(--green-600); margin: 0;">Dựa trên phân tích hành vi từ Knowledge Base Graph (AI)</p>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #6d28d9; margin: 0;">Gợi ý từ Graph DB</h3>
+            <p style="font-size: 0.8rem; color: #7c3aed; margin: 0; font-weight: 500;">Phân tích mối quan hệ liên kết sách bằng Knowledge Base Graph (AI)</p>
         </div>
-        <span class="badge" style="background: var(--green-600); color: #fff; margin-left: auto; padding: 4px 12px; font-size: 0.7rem;">KB_Graph</span>
+        <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; margin-left: auto; padding: 4px 14px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">KB_Graph</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
         {% for product in graph_recommendations %}
-        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; background: rgba(255,255,255,0.85); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; transition: var(--transition); backdrop-filter: blur(4px);"
-           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)'"
-           onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
-            <div style="text-align: center; padding: 16px 0; background: var(--green-50); border-radius: 8px; margin-bottom: 10px; font-size: 2rem; position: relative;">
-                📖
-                <span class="badge" style="position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; font-size: 0.62rem; padding: 2px 8px;">AI Pick</span>
+        <div class="card" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-lg); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: #fff; position: relative;"
+             onmouseover="this.style.borderColor='var(--green-400)'; this.style.boxShadow='0 12px 30px rgba(139, 92, 246, 0.08)'; this.style.transform='translateY(-4px)'"
+             onmouseout="this.style.borderColor='var(--border-light)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='none'">
+            
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block;">
+                <div style="text-align: center; padding: 24px 0; background: linear-gradient(135deg, #f5f3ff, #faf5ff); border-bottom: 1px solid var(--border-light); font-size: 2.8rem; position: relative;">
+                    📖
+                    <span class="badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; font-size: 0.62rem; padding: 2px 8px; font-weight: 700;">AI Pick</span>
+                </div>
+            </a>
+            
+            <div style="padding: 16px; display: flex; flex-direction: column; flex-grow: 1;">
+                <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block; flex-grow: 1; margin-bottom: 10px;">
+                    <h4 style="font-weight: 700; color: var(--text-dark); font-size: 0.9rem; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">{{ product.title }}</h4>
+                    <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">{{ product.author }}</div>
+                </a>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 10px;">
+                    <span class="price" style="font-size: 1.05rem; font-weight: 800;">${{ product.effective_price|default:product.price }}</span>
+                    {% if product.recommendation_score %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.08); color: var(--success); font-size: 0.68rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2);">⭐ Score: {{ product.recommendation_score }}</span>
+                    {% endif %}
+                </div>
             </div>
-            <div style="font-weight: 700; color: var(--text-dark); font-size: 0.85rem; line-height: 1.4; flex-grow: 1;">{{ product.title }}</div>
-            <div style="color: var(--text-muted); font-size: 0.78rem; margin: 4px 0 8px;">{{ product.author }}</div>
-            <div class="flex items-center justify-between">
-                <span class="price" style="font-size: 0.95rem;">${{ product.effective_price|default:product.price }}</span>
-                {% if product.recommendation_score %}
-                <span style="color: var(--green-600); font-size: 0.7rem; font-weight: 600;">⭐ Score: {{ product.recommendation_score }}</span>
-                {% endif %}
-            </div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 </div>
@@ -89,48 +100,77 @@
 {% if products %}
 <div class="grid-4">
     {% for product in products %}
-    <a href="{% url 'product_detail' product.id %}" class="card" style="text-decoration: none; padding: 20px; display: flex; flex-direction: column;">
-        <div style="text-align: center; padding: 24px 0; background: var(--green-50); border-radius: var(--radius-md); margin-bottom: 14px; font-size: 2.5rem; position: relative;">
-            📖
-            {% if product.is_featured %}
-            <span class="badge badge-featured" style="position: absolute; top: 8px; right: 8px;">⭐ Nổi bật</span>
-            {% endif %}
-            {% if product.discount_percent %}
-            <span class="badge badge-sale" style="position: absolute; top: 8px; left: 8px;">-{{ product.discount_percent }}%</span>
-            {% endif %}
-        </div>
-
-        <div style="font-weight: 700; color: var(--text-dark); font-size: 0.92rem; margin-bottom: 4px; line-height: 1.4; flex-grow: 1;">
-            {{ product.title }}
-        </div>
-        <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 8px;">{{ product.author }}</div>
-
-        {% if product.category_name %}
-        <span class="badge badge-category mb-1" style="align-self: flex-start;">{{ product.category_name }}</span>
+    <div class="card" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-lg); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-card); position: relative;"
+         onmouseover="this.style.borderColor='var(--green-400)'; this.style.boxShadow='0 12px 30px rgba(99, 102, 241, 0.08)'; this.style.transform='translateY(-4px)'"
+         onmouseout="this.style.borderColor='var(--border-light)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='none'">
+        
+        <!-- Floating discount badge -->
+        {% if product.discount_percent %}
+        <span class="badge badge-sale" style="position: absolute; top: 12px; left: 12px; z-index: 10; padding: 4px 10px; font-weight: 800; border-radius: 6px;">
+            -{{ product.discount_percent }}%
+        </span>
         {% endif %}
 
-        <div class="flex items-center justify-between" style="margin-top: 10px;">
-            <div class="flex items-center gap-1">
-                <span class="price">${{ product.effective_price }}</span>
-                {% if product.discount_price and product.discount_percent %}
-                <span class="price-old">${{ product.price }}</span>
+        <!-- Book Image Area -->
+        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block;">
+            <div style="text-align: center; padding: 36px 0; background: linear-gradient(135deg, #f3f4f6, #f9fafb); border-bottom: 1px solid var(--border-light); font-size: 3.5rem; transition: var(--transition); position: relative;">
+                📖
+                {% if product.is_featured %}
+                <span class="badge badge-featured" style="position: absolute; top: 12px; right: 12px; font-size: 0.65rem; padding: 3px 8px; border-radius: 4px;">⭐ Nổi bật</span>
                 {% endif %}
             </div>
-            {% if product.stock > 0 %}
-            <span style="color: var(--success); font-size: 0.75rem; font-weight: 600;">Còn hàng</span>
-            {% else %}
-            <span style="color: var(--danger); font-size: 0.75rem; font-weight: 600;">Hết hàng</span>
-            {% endif %}
+        </a>
+
+        <!-- Book Info Area -->
+        <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; margin-bottom: 8px;">
+                {% if product.category_name %}
+                <span class="badge badge-category" style="font-size: 0.65rem; padding: 2px 8px; border-radius: 4px;">{{ product.category_name }}</span>
+                {% endif %}
+                <span style="color: #f59e0b; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 2px;">
+                    ★ 4.8
+                </span>
+            </div>
+
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; display: block; flex-grow: 1; margin-bottom: 12px;">
+                <h3 style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                    {{ product.title }}
+                </h3>
+                <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">{{ product.author }}</div>
+            </a>
+
+            <!-- Buy row -->
+            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 12px;">
+                <div style="display: flex; align-items: baseline; gap: 4px;">
+                    <span class="price" style="font-size: 1.15rem; font-weight: 800;">${{ product.effective_price }}</span>
+                    {% if product.discount_price and product.discount_percent %}
+                    <span class="price-old" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: line-through;">${{ product.price }}</span>
+                    {% endif %}
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    {% if product.stock > 0 %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.08); color: var(--success); font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 4px;">Còn hàng</span>
+                    {% else %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.08); color: var(--danger); font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 4px;">Hết hàng</span>
+                    {% endif %}
+                    <a href="{% url 'product_detail' product.id %}" class="btn" style="padding: 7px 12px; font-size: 0.78rem; background: var(--green-50); color: var(--green-700); border-radius: 6px; font-weight: 700; border: none; transition: var(--transition);"
+                       onmouseover="this.style.background='var(--green-100)';"
+                       onmouseout="this.style.background='var(--green-50)';">
+                        Chi tiết
+                    </a>
+                </div>
+            </div>
         </div>
-    </a>
+    </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="card text-center" style="padding: 60px 20px;">
-    <div style="font-size: 3rem; margin-bottom: 16px;">📭</div>
-    <h3 style="color: var(--text-dark); margin-bottom: 8px;">Không tìm thấy sách nào</h3>
-    <p style="color: var(--text-muted);">Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
-    <a href="{% url 'product_list' %}" class="btn btn-outline mt-2">Xem tất cả sách</a>
+<div class="card text-center" style="padding: 60px 20px; border-radius: var(--radius-xl);">
+    <div style="font-size: 3.5rem; margin-bottom: 16px;">📭</div>
+    <h3 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 800;">Không tìm thấy sách nào</h3>
+    <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px;">Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Xem tất cả sách</a>
 </div>
 {% endif %}
 {% endblock %}
