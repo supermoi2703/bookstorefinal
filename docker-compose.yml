@@ -289,7 +289,6 @@ services:
       - ./ai-service/data:/app/data
     networks:
       - productstore-network
-
   rating-db:
     image: mysql:8.0
     environment:
@@ -309,6 +308,10 @@ services:
     build: ./api-gateway
     ports:
       - "8000:8000"
+    volumes:
+      - ./api-gateway/templates:/app/templates
+      - ./api-gateway/app:/app/app
+      - ./api-gateway/api_gateway:/app/api_gateway
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8000
       - CART_SERVICE_URL=http://cart-service:8000
