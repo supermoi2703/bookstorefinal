@@ -612,6 +612,7 @@ docker-compose up --build -d api-gateway
 
 | Role | Email | Password |
 |------|-------|----------|
+| Staff (Admin mới tạo) | admin@gmail.com | adminpassword |
 | Staff | staff@productstore.com | staff123 |
 | Customer | customer1@gmail.com | customer123 |
 | Customer | customer2@gmail.com | customer123 |
@@ -622,9 +623,9 @@ docker-compose up --build -d api-gateway
 ## 🎨 Giao diện người dùng
 
 ### Theme
-- **Màu chủ đề**: Xanh lá (Green) — #22c55e
-- **Font**: Inter (Google Fonts)
-- **Design**: Modern, Light theme, Card-based layout
+- **Màu chủ đề**: Tím Hoàng Gia & Indigo (Royal Violet & Indigo) — #8b5cf6 / #6366f1 (Mới nâng cấp)
+- **Font**: Plus Jakarta Sans (Google Fonts) (Mới nâng cấp)
+- **Design**: Modern, Light theme, Card-based layout with active state highlight and card-lift micro-animations
 - **Responsive**: Hỗ trợ mobile, tablet, desktop
 
 ### Trang giao diện
